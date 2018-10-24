@@ -31,7 +31,7 @@ final case class RepoOut(
     default_branch: Branch
 ) {
   def parentOrRaise[F[_]](implicit F: ApplicativeThrowable[F]): F[RepoOut] =
-    parent.fold(F.raiseError[RepoOut](new Throwable(s"repo $name has no parent")))(F.pure)
+    parent.fold(F.pure(this))(F.pure)
 
   def repo: Repo =
     Repo(owner.login, name)

@@ -29,6 +29,14 @@ object ioLegacy {
   def updateDir[F[_]: Sync](dir: File, update: Update): F[Unit] =
     FileAlg.create[F].walk(dir).filter(isSourceFile).evalMap(updateFile(_, update)).compile.drain
 
+  def updateDir[F[_]: Sync](dir: File, updates: List[Update]): F[Unit] =
+    FileAlg.create[F].walk(dir).filter(isSourceFile).evalMap(updateFile(_, updates)).compile.drain
+
+  def updateFile[F[_]](file: File, updates: List[Update])(implicit F: Sync[F]): F[File] =
+    F.delay(
+      file.write(updates.foldLeft(file.contentAsString)((a, b) => b.replaceAllIn(a).getOrElse(a)))
+    )
+
   def updateFile[F[_]](file: File, update: Update)(implicit F: Sync[F]): F[File] =
     F.delay(update.replaceAllIn(file.contentAsString).fold(file)(file.write(_)))
 }

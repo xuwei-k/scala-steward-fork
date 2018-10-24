@@ -16,6 +16,9 @@
 
 package eu.timepit.scalasteward.nurture
 
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+
 import cats.effect.Sync
 import cats.implicits._
 import cats.{FlatMap, Monad}
@@ -69,10 +72,25 @@ class NurtureAlg[F[_]](
       updates <- sbtAlg.getUpdatesForRepo(repo)
       _ <- logger.info(util.logger.showUpdates(updates))
       filtered <- filterAlg.localFilterMany(repo, updates)
-      _ <- filtered.traverse_ { update =>
-        val data = UpdateData(repo, update, baseBranch, git.branchFor(update))
-        processUpdate(data)
+      _ <- {
+        filtered match {
+          case List(update) =>
+            val data = UpdateData(repo, update, baseBranch, git.branchFor(update))
+            processUpdate(data)
+          case _ =>
+            processUpdates(
+              filtered.map { update =>
+                UpdateData(repo, update, baseBranch, git.branchFor(update))
+              }
+            )
+        }
       }
+    } yield ()
+
+  def processUpdates(data: List[UpdateData])(implicit F: BracketThrowable[F]): F[Unit] =
+    for {
+      _ <- logger.info(s"Process update ${data.map(_.update.show)}")
+      _ <- applyNewUpdates(data)
     } yield ()
 
   def processUpdate(data: UpdateData)(implicit F: BracketThrowable[F]): F[Unit] =
@@ -90,6 +108,23 @@ class NurtureAlg[F[_]](
       }
     } yield ()
 
+  def applyNewUpdates(data: List[UpdateData])(implicit F: BracketThrowable[F]): F[Unit] = {
+    val d = data.head
+    val repo = d.repo
+    (editAlg.applyUpdates(repo, data.map(_.update)) >> gitAlg.containsChanges(repo))
+      .ifM(
+        gitAlg.returnToCurrentBranch(repo) {
+          val branch = Branch("update-" + DateTimeFormatter.ISO_DATE.format(LocalDate.now()))
+          for {
+            _ <- logger.info(s"Create branch ${data.map(_.updateBranch)}")
+            _ <- gitAlg.createBranch(repo, branch)
+            _ <- commitAndPush(repo, "update dependencies", branch)
+          } yield ()
+        },
+        logger.warn("No files were changed")
+      )
+  }
+
   def applyNewUpdate(data: UpdateData)(implicit F: BracketThrowable[F]): F[Unit] =
     (editAlg.applyUpdate(data.repo, data.update) >> gitAlg.containsChanges(data.repo)).ifM(
       gitAlg.returnToCurrentBranch(data.repo) {
@@ -97,11 +132,17 @@ class NurtureAlg[F[_]](
           _ <- logger.info(s"Create branch ${data.updateBranch.name}")
           _ <- gitAlg.createBranch(data.repo, data.updateBranch)
           _ <- commitAndPush(data)
-          _ <- createPullRequest(data)
         } yield ()
       },
       logger.warn("No files were changed")
     )
+
+  def commitAndPush(repo: Repo, message: String, branch: Branch)(implicit F: FlatMap[F]): F[Unit] =
+    for {
+      _ <- gitAlg.commitAll(repo, message)
+      _ <- sbtAlg.testCompile(repo)
+      _ <- gitAlg.push(repo, branch)
+    } yield ()
 
   def commitAndPush(data: UpdateData)(implicit F: FlatMap[F]): F[Unit] =
     for {
