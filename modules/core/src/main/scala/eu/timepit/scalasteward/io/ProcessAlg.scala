@@ -19,7 +19,6 @@ package eu.timepit.scalasteward.io
 import better.files.File
 import cats.data.{NonEmptyList => Nel}
 import cats.effect.Sync
-import cats.implicits._
 import java.io.IOException
 import scala.collection.mutable.ListBuffer
 import scala.sys.process.{Process, ProcessLogger}
@@ -47,13 +46,6 @@ object ProcessAlg {
         }
 
       override def execSandboxed(command: Nel[String], cwd: File): F[List[String]] =
-        F.delay(File.home.pathAsString).flatMap { home =>
-          val whitelisted = List(
-            s"$home/.sbt",
-            s"$home/.ivy2",
-            cwd.pathAsString
-          ).map(dir => s"--whitelist=$dir")
-          exec(Nel("firejail", whitelisted) ::: command, cwd)
-        }
+        exec(command, cwd)
     }
 }

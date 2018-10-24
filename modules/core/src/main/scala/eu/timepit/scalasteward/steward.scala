@@ -16,7 +16,6 @@
 
 package eu.timepit.scalasteward
 
-import better.files.File
 import cats.effect.{ExitCode, IO, IOApp}
 import cats.implicits._
 import eu.timepit.scalasteward.application.Context
@@ -27,8 +26,9 @@ object steward extends IOApp {
   override def run(args: List[String]): IO[ExitCode] =
     Context.create[IO].use { ctx =>
       ctx.logger.infoTotalTime {
+        val repos = getRepos(args)
+
         for {
-          repos <- getRepos(ctx.config.workspace)
           _ <- prepareEnv(ctx)
           //user <- ctx.config.gitHubUser[IO]
           //_ <- repos.traverse(ctx.dependencyService.forkAndCheckDependencies(user, _))
@@ -44,10 +44,10 @@ object steward extends IOApp {
       _ <- ctx.workspaceAlg.cleanWorkspace
     } yield ()
 
-  def getRepos(workspace: File): IO[List[Repo]] =
-    IO {
-      val file = workspace / ".." / "repos.md"
-      val regex = """-\s+(.+)/(.+)""".r
-      file.lines.collect { case regex(owner, repo) => Repo(owner, repo) }.toList
+  def getRepos(repos: List[String]): List[Repo] = {
+    repos.map { name =>
+      val Array(user, repo) = name.split('/')
+      Repo(user, repo)
     }
+  }
 }
