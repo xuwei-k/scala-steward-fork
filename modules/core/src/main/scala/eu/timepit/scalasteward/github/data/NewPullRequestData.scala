@@ -19,8 +19,6 @@ package eu.timepit.scalasteward.github.data
 import cats.implicits._
 import eu.timepit.scalasteward.git.Branch
 import eu.timepit.scalasteward.model.Update
-import eu.timepit.scalasteward.nurture.UpdateData
-import eu.timepit.scalasteward.{git, github}
 import io.circe.Encoder
 import io.circe.generic.semiauto._
 
@@ -54,11 +52,16 @@ object NewPullRequestData {
         |""".stripMargin.trim
   }
 
-  def from(data: UpdateData, login: String): NewPullRequestData =
+  def from(
+      message: String,
+      headBranch: Branch,
+      baseBranch: Branch,
+      login: String
+  ): NewPullRequestData =
     NewPullRequestData(
-      title = git.commitMsgFor(data.update),
-      body = bodyFor(data.update, login),
-      head = github.headFor(login, data.update),
-      base = data.baseBranch
+      title = message,
+      body = "",
+      head = s"$login:${headBranch.name}",
+      base = baseBranch
     )
 }
