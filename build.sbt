@@ -58,6 +58,9 @@ lazy val core = myCrossProject("core")
   )
 
 lazy val coreJVM = core.jvm
+  .settings(
+    scalacOptions -= "-Xfatal-warnings"
+  )
 
 lazy val readme = project
   .in(file("modules/readme"))

@@ -27,19 +27,21 @@ final case class Config(
     gitAuthor: Author,
     gitHubApiHost: String,
     gitHubLogin: String,
-    gitHubTokenFile: File
+    private val gitHubTokenFile: File
 ) {
   def gitHubUser[F[_]](implicit F: Sync[F]): F[AuthenticatedUser] =
-    F.delay(AuthenticatedUser(gitHubLogin, gitHubTokenFile.contentAsString.trim))
+    F.delay(AuthenticatedUser(gitHubLogin, token))
+
+  lazy val token: String = sys.env.getOrElse("GITHUB_TOKEN", gitHubTokenFile.contentAsString.trim)
 }
 
 object Config {
   def default[F[_]](implicit F: Sync[F]): F[Config] =
     F.delay(File.home).map { home =>
-      val login = "scala-steward"
+      val login = "xuwei-k"
       Config(
         workspace = home / "code/scala-steward/workspace",
-        gitAuthor = Author("Scala steward", "scala-steward@timepit.eu"),
+        gitAuthor = Author("xuwei-k", "6b656e6a69@gmail.com"),
         gitHubApiHost = "https://api.github.com",
         gitHubLogin = login,
         gitHubTokenFile = home / s".github/tokens/$login"

@@ -64,7 +64,8 @@ object Context {
       implicit val logger: Logger[F] = logger_
       implicit val fileAlg: FileAlg[F] = FileAlg.create[F]
       implicit val filterAlg: FilterAlg[F] = FilterAlg.create[F]
-      implicit val processAlg: ProcessAlg[F] = ProcessAlg.create[F]
+      implicit val processAlg: ProcessAlg[F] =
+        ProcessAlg.create[F](secretValues = config_.token :: Nil)
       implicit val user: AuthenticatedUser = user_
       implicit val workspace: File = config_.workspace
       implicit val workspaceAlg: WorkspaceAlg[F] = WorkspaceAlg.create[F]
