@@ -30,7 +30,11 @@ import eu.timepit.scalasteward.sbtLegacy
 import io.chrisdavenport.log4cats.Logger
 
 trait SbtAlg[F[_]] {
+  def run(repo: Repo): F[Unit]
+
   def addGlobalPlugin(plugin: FileData): F[Unit]
+
+  def deleteGlobalPlugins: F[Unit]
 
   def addGlobalPlugins: F[Unit]
 
@@ -56,6 +60,18 @@ object SbtAlg {
           sbtDir.flatMap(dir => fileAlg.writeFileData(dir / series / "plugins", plugin))
         }
 
+      def deleteGlobalPlugin(plugin: FileData): F[Unit] =
+        List("0.13", "1.0").traverse_ { series =>
+          sbtDir.flatMap(dir => fileAlg.delete(dir / series / "plugins" / plugin.name))
+        }
+
+      override def deleteGlobalPlugins: F[Unit] =
+        for {
+          _ <- logger.info("delete global sbt plugins")
+          _ <- deleteGlobalPlugin(sbtUpdatesPlugin)
+          _ <- deleteGlobalPlugin(stewardPlugin)
+        } yield ()
+
       override def addGlobalPlugins: F[Unit] =
         for {
           _ <- logger.info("Add global sbt plugins")
@@ -67,7 +83,7 @@ object SbtAlg {
         for {
           repoDir <- workspaceAlg.repoDir(repo)
           cmd = sbtCmd(libraryDependenciesAsJson, reloadPlugins, libraryDependenciesAsJson)
-          lines <- ignoreOptsFiles(repoDir)(processAlg.execSandboxed(cmd, repoDir))
+          lines <- ignoreOptsFiles(repoDir)(processAlg.exec(cmd, repoDir, s"[${repo.repo}]"))
         } yield lines.flatMap(parseDependencies).distinct
 
       override def getUpdates(project: ArtificialProject): F[List[Update]] =
@@ -86,7 +102,7 @@ object SbtAlg {
         for {
           repoDir <- workspaceAlg.repoDir(repo)
           cmd = sbtCmd(setCredentialsToNil, dependencyUpdates, reloadPlugins, dependencyUpdates)
-          lines <- ignoreOptsFiles(repoDir)(processAlg.execSandboxed(cmd, repoDir))
+          lines <- ignoreOptsFiles(repoDir)(processAlg.exec(cmd, repoDir, s"[${repo.repo}]"))
         } yield sbtLegacy.sanitizeUpdates(sbtLegacy.toUpdates(lines))
 
       val sbtDir: F[File] =
@@ -101,5 +117,12 @@ object SbtAlg {
             fa
           }
         }
+
+      def run(repo: Repo): F[Unit] =
+        for {
+          repoDir <- workspaceAlg.repoDir(repo)
+          cmd = sbtCmd(repo.testCommands: _*)
+          _ <- ignoreOptsFiles(repoDir)(processAlg.exec(cmd, repoDir, s"[${repo.repo}]"))
+        } yield ()
     }
 }

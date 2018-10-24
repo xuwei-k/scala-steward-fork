@@ -39,6 +39,8 @@ trait GitAlg[F[_]] {
 
   def createBranch(repo: Repo, branch: Branch): F[Unit]
 
+  def deleteBranch(repo: Repo, branch: Branch): F[Unit]
+
   def currentBranch(repo: Repo): F[Branch]
 
   def isBehind(repo: Repo, branch: Branch, base: Branch): F[Boolean]
@@ -47,7 +49,7 @@ trait GitAlg[F[_]] {
 
   def latestSha1(repo: Repo, branch: Branch)(implicit F: MonadThrowable[F]): F[Sha1]
 
-  def push(repo: Repo, branch: Branch): F[Unit]
+  def push(repo: Repo, branch: Branch, force: Boolean): F[Unit]
 
   def remoteBranchExists(repo: Repo, branch: Branch): F[Boolean]
 
@@ -96,6 +98,7 @@ object GitAlg {
         for {
           repoDir <- workspaceAlg.repoDir(repo)
           _ <- exec(Nel.of("commit", "--all", "-m", message), repoDir)
+          _ <- exec(Nel.of("diff", "HEAD^"), repoDir)
         } yield ()
 
       override def containsChanges(repo: Repo): F[Boolean] =
@@ -107,6 +110,12 @@ object GitAlg {
         for {
           repoDir <- workspaceAlg.repoDir(repo)
           _ <- exec(Nel.of("checkout", "-b", branch.name), repoDir)
+        } yield ()
+
+      def deleteBranch(repo: Repo, branch: Branch): F[Unit] =
+        for {
+          repoDir <- workspaceAlg.repoDir(repo)
+          _ <- exec(Nel.of("branch", "-D", branch.name), repoDir)
         } yield ()
 
       override def currentBranch(repo: Repo): F[Branch] =
@@ -132,10 +141,14 @@ object GitAlg {
           sha1 <- F.fromEither(Sha1.from(lines.mkString("").trim))
         } yield sha1
 
-      override def push(repo: Repo, branch: Branch): F[Unit] =
+      override def push(repo: Repo, branch: Branch, force: Boolean): F[Unit] =
         for {
           repoDir <- workspaceAlg.repoDir(repo)
-          _ <- exec(Nel.of("push", "--force", "--set-upstream", "origin", branch.name), repoDir)
+          f = if (force) List("--force") else Nil
+          _ <- exec(
+            Nel.of("push", (f ::: List("--set-upstream", "origin", branch.name)): _*),
+            repoDir
+          )
         } yield ()
 
       override def remoteBranchExists(repo: Repo, branch: Branch): F[Boolean] =
@@ -170,7 +183,7 @@ object GitAlg {
           _ <- exec(Nel.of("fetch", remote), repoDir)
           _ <- exec(Nel.of("checkout", "-B", branch, "--track", remoteBranch), repoDir)
           _ <- exec(Nel.of("merge", remoteBranch), repoDir)
-          _ <- push(repo, defaultBranch)
+          _ <- push(repo, defaultBranch, force = true)
         } yield ()
 
       def exec(command: Nel[String], cwd: File): F[List[String]] =

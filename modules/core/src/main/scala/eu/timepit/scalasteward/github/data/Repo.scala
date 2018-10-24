@@ -20,7 +20,9 @@ import io.circe.{KeyDecoder, KeyEncoder}
 
 final case class Repo(
     owner: String,
-    repo: String
+    repo: String,
+    createPullRequest: Boolean = false,
+    testCommands: List[String] = "test:compile" :: Nil
 ) {
   def show: String = s"$owner/$repo"
 }

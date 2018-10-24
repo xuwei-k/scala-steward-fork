@@ -41,8 +41,30 @@ trait FilterAlg[F[_]] {
 object FilterAlg {
   def create[F[_]](implicit logger: Logger[F], F: Applicative[F]): FilterAlg[F] =
     new FilterAlg[F] {
+      object ScalazVersions {
+        def unapply(value: String): Boolean =
+          (value.startsWith("7.3") || value.startsWith("8"))
+      }
+
       def globalKeep(update: Update): Boolean =
         (update.groupId, update.artifactId, update.nextVersion) match {
+          // squeryl
+          case ("mysql", "mysql-connector-java", v) if v.startsWith("8.") => false
+          case ("org.postgresql", "postgresql", v) if v.startsWith("42.") => false
+
+          case ("org.scala-sbt", "sbt-launch", _) => false
+
+          case ("org.scalaz.stream", "scalaz-stream", "0.8.6") => false
+
+          case ("org.scalaz", _, ScalazVersions()) => false
+
+          case ("javax.servlet", "javax.servlet-api", _) => false
+
+          // argonaut
+          case ("com.google.caliper", "caliper", _) => false
+
+          case ("com.geirsson", a, _) if a.startsWith("scalafmt-core") => false
+
           case ("org.scala-lang", "scala-compiler", _) => false
           case ("org.scala-lang", "scala-library", _)  => false
 
@@ -71,7 +93,24 @@ object FilterAlg {
       def localKeep(repo: Repo, update: Update): Boolean =
         (repo.show, update.groupId, update.artifactId) match {
           case ("scala/scala-dist", "com.amazonaws", "aws-java-sdk-s3") => false
-          case _                                                        => true
+          case ("squeryl/squeryl", "org.apache.derby", "derby")         => false
+
+          case ("foundweekends/conscript", "net.databinder.dispatch", _) => false
+          case ("foundweekends/conscript", "net.liftweb", _)             => false
+
+          case ("foundweekends/giter8", "org.codehaus.plexus", "plexus-archiver") => false
+          case ("foundweekends/giter8", "org.scalacheck", "scalacheck")           => false
+
+          case ("gitbucket/gitbucket", "com.wix", "wix-embedded-mysql") => false
+
+          case ("xuwei-k/iarray", "org.scalaz", _) => false
+
+          case ("eed3si9n/sjson-new", "pl.project13.scala", "sbt-jmh") => false
+
+          case ("atnos-org/eff", "org.portable-scala", _) => false
+          case ("atnos-org/eff", "org.tpolecat", _) => false // doobie
+
+          case _ => true
         }
 
       def filterImpl(keep: Boolean, update: Update): F[Option[Update]] =
