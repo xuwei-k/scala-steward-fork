@@ -17,6 +17,8 @@
 package eu.timepit.scalasteward
 
 import better.files.File
+import cats.Functor
+import cats.data.NonEmptyList
 import cats.effect.Sync
 import eu.timepit.scalasteward.io.FileAlg
 import eu.timepit.scalasteward.model.Update
@@ -28,6 +30,42 @@ object ioLegacy {
 
   def updateDir[F[_]: Sync](dir: File, update: Update): F[Unit] =
     FileAlg.create[F].walk(dir).filter(isSourceFile).evalMap(updateFile(_, update)).compile.drain
+
+  def updateDir[F[_]: Sync: Functor](dir: File, updates: NonEmptyList[Update]): F[List[Update]] =
+    Functor[F].map(
+      FileAlg
+        .create[F]
+        .walk(dir)
+        .filter(isSourceFile)
+        .evalMap(updateFile(_, updates))
+        .compile
+        .toList
+    ) { list =>
+      val size = list.size
+      list.flatten
+        .groupBy(identity)
+        .map { case (k, v) => k -> v.size }
+        .filter(_._2 == size)
+        .keys
+        .toList
+    }
+
+  def updateFile[F[_]](file: File, updates: NonEmptyList[Update])(
+      implicit F: Sync[F]
+  ): F[List[Update]] =
+    F.delay {
+      val (contents, list) = updates.foldLeft((file.contentAsString, List.empty[Update])) {
+        case ((a, noChanges), b) =>
+          b.replaceAllIn(a) match {
+            case Some(x) =>
+              (x, noChanges)
+            case None =>
+              (a, b :: noChanges)
+          }
+      }
+      file.write(contents)
+      list.reverse
+    }
 
   def updateFile[F[_]](file: File, update: Update)(implicit F: Sync[F]): F[File] =
     F.delay(update.replaceAllIn(file.contentAsString).fold(file)(file.write(_)))
