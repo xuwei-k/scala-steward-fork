@@ -18,7 +18,8 @@ package eu.timepit.scalasteward.nurture
 
 import cats.effect.Sync
 import cats.implicits._
-import cats.{FlatMap, Monad}
+import cats.FlatMap
+import cats.data.NonEmptyList
 import eu.timepit.scalasteward.application.Config
 import eu.timepit.scalasteward.git.{Branch, GitAlg}
 import eu.timepit.scalasteward.github.GitHubApiAlg
@@ -69,11 +70,38 @@ class NurtureAlg[F[_]](
       updates <- sbtAlg.getUpdatesForRepo(repo)
       _ <- logger.info(util.logger.showUpdates(updates))
       filtered <- filterAlg.localFilterMany(repo, updates)
-      _ <- filtered.traverse_ { update =>
-        val data = UpdateData(repo, update, baseBranch, git.branchFor(update))
-        processUpdate(data)
+      _ <- {
+        filtered match {
+          case Nil =>
+            F.unit
+          case List(update) =>
+            val data = UpdateData(repo, update, baseBranch, git.branchFor(update))
+            processUpdate(data)
+          case h :: t =>
+            for {
+              success <- processUpdates(
+                NonEmptyList(h, t).map { update =>
+                  UpdateData(repo, update, baseBranch, git.branchFor(update))
+                }
+              )
+              _ <- if (success) {
+                F.unit
+              } else {
+                filtered.traverse_ { update =>
+                  val data = UpdateData(repo, update, baseBranch, git.branchFor(update))
+                  processUpdate(data)
+                }
+              }
+            } yield ()
+        }
       }
     } yield ()
+
+  def processUpdates(data: NonEmptyList[UpdateData])(implicit F: BracketThrowable[F]): F[Boolean] =
+    for {
+      _ <- logger.info(s"Process update ${data.map(_.update.show)}")
+      success <- applyNewUpdates(data)
+    } yield success
 
   def processUpdate(data: UpdateData)(implicit F: BracketThrowable[F]): F[Unit] =
     for {
@@ -90,6 +118,43 @@ class NurtureAlg[F[_]](
       }
     } yield ()
 
+  def applyNewUpdates(
+      data: NonEmptyList[UpdateData]
+  )(implicit F: BracketThrowable[F]): F[Boolean] = {
+    val d = data.head
+    val repo = d.repo
+    (editAlg.applyUpdates(repo, data.map(_.update)) >> gitAlg.containsChanges(repo))
+      .ifM(
+        gitAlg.returnToCurrentBranch(repo) {
+          val branch = Branch(
+            data.toList
+              .sortBy(d => (d.update.name, d.update.nextVersion))
+              .map(d => s"${d.update.name}-${d.update.nextVersion}")
+              .mkString("update-", "-", "")
+          )
+          for {
+            _ <- logger.info(s"Create branch ${branch.name}")
+            _ <- gitAlg.createBranch(repo, branch)
+            message = "Update dependencies"
+            success <- commitAndPush(repo, message, branch)
+            _ <- if (success) {
+              createPullRequest(
+                baseBranch = d.baseBranch,
+                repo = repo,
+                branch = branch,
+                message = message
+              )
+            } else {
+              F.unit
+            }
+          } yield success
+        }, {
+          logger.warn("No files were changed")
+          F.point(true)
+        }
+      )
+  }
+
   def applyNewUpdate(data: UpdateData)(implicit F: BracketThrowable[F]): F[Unit] =
     (editAlg.applyUpdate(data.repo, data.update) >> gitAlg.containsChanges(data.repo)).ifM(
       gitAlg.returnToCurrentBranch(data.repo) {
@@ -97,23 +162,57 @@ class NurtureAlg[F[_]](
           _ <- logger.info(s"Create branch ${data.updateBranch.name}")
           _ <- gitAlg.createBranch(data.repo, data.updateBranch)
           _ <- commitAndPush(data)
-          _ <- createPullRequest(data)
+          _ <- createPullRequest(
+            baseBranch = data.baseBranch,
+            repo = data.repo,
+            branch = data.updateBranch,
+            message = git.commitMsgFor(data.update)
+          )
         } yield ()
       },
       logger.warn("No files were changed")
     )
 
-  def commitAndPush(data: UpdateData)(implicit F: FlatMap[F]): F[Unit] =
+  def commitAndPush(repo: Repo, message: String, branch: Branch)(
+      implicit F: MonadThrowable[F]
+  ): F[Boolean] =
+    for {
+      _ <- gitAlg.commitAll(repo, message)
+      success <- sbtAlg.testCompile(repo).map(_ => true).recoverWith {
+        case e =>
+          logger.error(e)("failed sbt test:compile")
+          F.point(false)
+      }
+      _ <- F.whenA(success) {
+        gitAlg.push(repo, branch)
+      }
+    } yield success
+
+  def commitAndPush(data: UpdateData)(implicit F: MonadThrowable[F]): F[Unit] =
     for {
       _ <- gitAlg.commitAll(data.repo, git.commitMsgFor(data.update))
-      _ <- gitAlg.push(data.repo, data.updateBranch)
+      success <- sbtAlg.testCompile(data.repo).map(_ => true).recoverWith {
+        case e =>
+          e.printStackTrace()
+          F.point(false)
+      }
+      _ <- F.whenA(success) {
+        gitAlg.push(data.repo, data.updateBranch)
+      }
     } yield ()
 
-  def createPullRequest(data: UpdateData)(implicit F: FlatMap[F]): F[Unit] =
+  def createPullRequest(baseBranch: Branch, repo: Repo, branch: Branch, message: String)(
+      implicit F: FlatMap[F]
+  ): F[Unit] =
     for {
-      _ <- logger.info(s"Create PR ${data.updateBranch.name}")
-      requestData = NewPullRequestData.from(data, config.gitHubLogin)
-      pullRequest <- gitHubApiAlg.createPullRequest(data.repo, requestData)
+      _ <- logger.info(s"Create PR ${branch.name}")
+      requestData = NewPullRequestData.from(
+        message = message,
+        headBranch = branch,
+        baseBranch = baseBranch,
+        login = config.gitHubLogin
+      )
+      pullRequest <- gitHubApiAlg.createPullRequest(repo, requestData)
       _ <- logger.info(s"Created PR ${pullRequest.html_url}")
     } yield ()
 
@@ -147,7 +246,7 @@ class NurtureAlg[F[_]](
       _ <- logger.info(msg)
     } yield result
 
-  def resetAndUpdate(data: UpdateData)(implicit F: Monad[F]): F[Unit] =
+  def resetAndUpdate(data: UpdateData)(implicit F: MonadThrowable[F]): F[Unit] =
     for {
       _ <- logger.info(s"Reset and update ${data.updateBranch.name}")
       _ <- gitAlg.resetHard(data.repo, data.baseBranch)

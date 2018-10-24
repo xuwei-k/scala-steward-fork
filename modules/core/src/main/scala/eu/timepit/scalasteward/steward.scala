@@ -16,7 +16,6 @@
 
 package eu.timepit.scalasteward
 
-import better.files.File
 import cats.effect.{ExitCode, IO, IOApp}
 import cats.implicits._
 import eu.timepit.scalasteward.application.Context
@@ -27,8 +26,9 @@ object steward extends IOApp {
   override def run(args: List[String]): IO[ExitCode] =
     Context.create[IO].use { ctx =>
       ctx.logger.infoTotalTime {
+        val repos = getRepos(args)
+
         for {
-          repos <- getRepos(ctx.config.workspace)
           _ <- prepareEnv(ctx)
           //user <- ctx.config.gitHubUser[IO]
           //_ <- repos.traverse(ctx.dependencyService.forkAndCheckDependencies(user, _))
@@ -44,10 +44,33 @@ object steward extends IOApp {
       _ <- ctx.workspaceAlg.cleanWorkspace
     } yield ()
 
-  def getRepos(workspace: File): IO[List[Repo]] =
-    IO {
-      val file = workspace / ".." / "repos.md"
-      val regex = """-\s+(.+)/(.+)""".r
-      file.lines.collect { case regex(owner, repo) => Repo(owner, repo) }.toList
+  def getRepos(repos: List[String]): List[Repo] =
+    if (repos.isEmpty) {
+      List(
+        Repo("scalaprops", "scalaprops"),
+        Repo("scalaprops", "scalaprops-native-example"),
+        Repo("scalaprops", "scalaprops-examples"),
+        Repo("scalaprops", "scalaprops-cross-example"),
+        Repo("scalaprops", "scalaprops-magnolia"),
+        Repo("scalaprops", "scalaprops-shapeless"),
+        Repo("scalaprops", "sbt-scalaprops"),
+        Repo("msgpack4z", "msgpack4z-core"),
+        Repo("msgpack4z", "msgpack4z-native"),
+        Repo("msgpack4z", "msgpack4z-circe"),
+        Repo("msgpack4z", "msgpack4z-argonaut"),
+        Repo("msgpack4z", "msgpack4z-play"),
+        Repo("msgpack4z", "msgpack4z-jawn"),
+        Repo("msgpack4z", "msgpack4z-native"),
+        Repo("scalapb-json", "scalapb-playjson"),
+        Repo("scalapb-json", "scalapb-circe"),
+        Repo("scalapb-json", "scalapb-argonaut"),
+        Repo("scalapb-json", "protoc-lint"),
+        Repo("scalapb-json", "scalapb-json-common")
+      )
+    } else {
+      repos.map { name =>
+        val Array(user, repo) = name.split('/')
+        Repo(user, repo)
+      }
     }
 }

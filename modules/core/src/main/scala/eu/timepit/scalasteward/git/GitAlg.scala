@@ -96,6 +96,7 @@ object GitAlg {
         for {
           repoDir <- workspaceAlg.repoDir(repo)
           _ <- exec(Nel.of("commit", "--all", "-m", message), repoDir)
+          _ <- exec(Nel.of("diff", "HEAD^"), repoDir)
         } yield ()
 
       override def containsChanges(repo: Repo): F[Boolean] =
