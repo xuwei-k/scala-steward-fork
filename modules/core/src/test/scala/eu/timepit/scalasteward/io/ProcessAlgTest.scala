@@ -7,7 +7,7 @@ import org.scalatest.{FunSuite, Matchers}
 
 class ProcessAlgTest extends FunSuite with Matchers {
   val processAlg: ProcessAlg[IO] =
-    ProcessAlg.create[IO]
+    ProcessAlg.create[IO](Nil)
 
   test("exec echo") {
     processAlg

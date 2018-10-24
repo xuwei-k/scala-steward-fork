@@ -16,6 +16,7 @@
 
 package eu.timepit.scalasteward.nurture
 
+import cats.data.NonEmptyList
 import cats.effect.Sync
 import cats.implicits._
 import eu.timepit.scalasteward.github.data.Repo
@@ -25,6 +26,7 @@ import eu.timepit.scalasteward.model.Update
 
 trait EditAlg[F[_]] {
   def applyUpdate(repo: Repo, update: Update): F[Unit]
+  def applyUpdates(repo: Repo, updates: NonEmptyList[Update]): F[Unit]
 }
 
 object EditAlg {
@@ -37,6 +39,10 @@ object EditAlg {
       override def applyUpdate(repo: Repo, update: Update): F[Unit] =
         workspaceAlg.repoDir(repo).flatMap { repoDir =>
           ioLegacy.updateDir(repoDir, update)
+        }
+      def applyUpdates(repo: Repo, updates: NonEmptyList[Update]): F[Unit] =
+        workspaceAlg.repoDir(repo).flatMap { repoDir =>
+          ioLegacy.updateDir(repoDir, updates)
         }
     }
 }
