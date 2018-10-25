@@ -36,10 +36,10 @@ final case class Config(
 object Config {
   def default[F[_]](implicit F: Sync[F]): F[Config] =
     F.delay(File.home).map { home =>
-      val login = "scala-steward"
+      val login = "xuwei-k"
       Config(
         workspace = home / "code/scala-steward/workspace",
-        gitAuthor = Author("Scala steward", "scala-steward@timepit.eu"),
+        gitAuthor = Author("xuwei-k", "6b656e6a69@gmail.com"),
         gitHubApiHost = "https://api.github.com",
         gitHubLogin = login,
         gitHubTokenFile = home / s".github/tokens/$login"
