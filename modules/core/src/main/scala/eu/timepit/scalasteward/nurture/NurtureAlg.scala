@@ -98,7 +98,6 @@ class NurtureAlg[F[_]](
           _ <- logger.info(s"Create branch ${data.updateBranch.name}")
           _ <- gitAlg.createBranch(data.repo, data.updateBranch)
           _ <- commitAndPush(data)
-          _ <- createPullRequest(data)
         } yield ()
       },
       logger.warn("No files were changed")
