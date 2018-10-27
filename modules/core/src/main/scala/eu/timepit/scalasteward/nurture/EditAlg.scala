@@ -41,7 +41,7 @@ object EditAlg {
         }
       def applyUpdates(repo: Repo, updates: List[Update]): F[Unit] =
         workspaceAlg.repoDir(repo).flatMap { repoDir =>
-          updates.traverse_(u => ioLegacy.updateDir(repoDir, u))
+          ioLegacy.updateDir(repoDir, updates)
         }
     }
 }

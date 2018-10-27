@@ -16,6 +16,9 @@
 
 package eu.timepit.scalasteward.nurture
 
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+
 import cats.effect.Sync
 import cats.implicits._
 import cats.{FlatMap, Monad}
@@ -112,10 +115,11 @@ class NurtureAlg[F[_]](
     (editAlg.applyUpdates(repo, data.map(_.update)) >> gitAlg.containsChanges(repo))
       .ifM(
         gitAlg.returnToCurrentBranch(repo) {
+          val branch = Branch("update-" + DateTimeFormatter.ISO_DATE.format(LocalDate.now()))
           for {
             _ <- logger.info(s"Create branch ${data.map(_.updateBranch)}")
-            _ <- gitAlg.createBranch(repo, Branch("update"))
-            _ <- commitAndPush(repo, "update dependencies", Branch("update"))
+            _ <- gitAlg.createBranch(repo, branch)
+            _ <- commitAndPush(repo, "update dependencies", branch)
           } yield ()
         },
         logger.warn("No files were changed")

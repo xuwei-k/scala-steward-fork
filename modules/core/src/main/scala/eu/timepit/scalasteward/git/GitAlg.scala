@@ -172,7 +172,9 @@ object GitAlg {
           _ <- push(repo, defaultBranch)
         } yield ()
 
-      def exec(command: Nel[String], cwd: File): F[List[String]] =
+      def exec(command: Nel[String], cwd: File): F[List[String]] = {
+        println((command, cwd))
         processAlg.exec(gitCmd :: command, cwd)
+      }
     }
 }
