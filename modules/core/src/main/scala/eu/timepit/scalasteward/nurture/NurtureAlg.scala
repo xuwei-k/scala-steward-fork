@@ -141,6 +141,7 @@ class NurtureAlg[F[_]](
   def commitAndPush(repo: Repo, message: String, branch: Branch)(implicit F: FlatMap[F]): F[Unit] =
     for {
       _ <- gitAlg.commitAll(repo, message)
+      _ <- sbtAlg.testCompile(repo)
       _ <- gitAlg.push(repo, branch)
     } yield ()
 
