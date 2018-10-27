@@ -95,6 +95,7 @@ object GitAlg {
         for {
           repoDir <- workspaceAlg.repoDir(repo)
           _ <- exec(Nel.of("commit", "--all", "-m", message), repoDir)
+          _ <- exec(Nel.of("diff", "HEAD^"), repoDir)
         } yield ()
 
       override def containsChanges(repo: Repo): F[Boolean] =
@@ -172,9 +173,7 @@ object GitAlg {
           _ <- push(repo, defaultBranch)
         } yield ()
 
-      def exec(command: Nel[String], cwd: File): F[List[String]] = {
-        println((command, cwd))
+      def exec(command: Nel[String], cwd: File): F[List[String]] =
         processAlg.exec(gitCmd :: command, cwd)
-      }
     }
 }

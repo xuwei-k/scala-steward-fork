@@ -34,10 +34,16 @@ object ProcessAlg {
     new ProcessAlg[F] {
       override def exec(command: Nel[String], cwd: File): F[List[String]] =
         F.delay {
+          println(command.toList.mkString(" "))
           val lb = ListBuffer.empty[String]
           val log = new ProcessLogger {
-            override def out(s: => String): Unit = lb.append(s)
-            override def err(s: => String): Unit = lb.append(s)
+            override def out(s: => String): Unit = {
+              val ss = s
+              println(ss)
+              lb.append(ss)
+            }
+            override def err(s: => String): Unit =
+              out(s)
             override def buffer[T](f: => T): T = f
           }
           val exitCode = Process(command.toList, cwd.toJava).!(log)
