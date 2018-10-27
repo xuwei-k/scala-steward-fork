@@ -44,10 +44,9 @@ object steward extends IOApp {
       _ <- ctx.workspaceAlg.cleanWorkspace
     } yield ()
 
-  def getRepos(repos: List[String]): List[Repo] = {
+  def getRepos(repos: List[String]): List[Repo] =
     repos.map { name =>
       val Array(user, repo) = name.split('/')
       Repo(user, repo)
     }
-  }
 }
