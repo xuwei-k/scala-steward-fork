@@ -20,7 +20,7 @@ import eu.timepit.scalasteward.model.Update
 
 package object git {
   def branchFor(update: Update): Branch =
-    Branch(s"update/${update.name}-${update.nextVersion}")
+    Branch(s"update-${update.name}-${update.nextVersion}")
 
   def commitMsgFor(update: Update): String =
     s"Update ${NameResolver.resolve(update)} to ${update.nextVersion}"
