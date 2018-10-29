@@ -21,7 +21,7 @@ import java.time.format.DateTimeFormatter
 
 import cats.effect.Sync
 import cats.implicits._
-import cats.{FlatMap, Monad}
+import cats.FlatMap
 import eu.timepit.scalasteward.application.Config
 import eu.timepit.scalasteward.git.{Branch, GitAlg}
 import eu.timepit.scalasteward.github.GitHubApiAlg
@@ -137,17 +137,32 @@ class NurtureAlg[F[_]](
       logger.warn("No files were changed")
     )
 
-  def commitAndPush(repo: Repo, message: String, branch: Branch)(implicit F: FlatMap[F]): F[Unit] =
+  def commitAndPush(repo: Repo, message: String, branch: Branch)(
+      implicit F: MonadThrowable[F]
+  ): F[Unit] =
     for {
       _ <- gitAlg.commitAll(repo, message)
-      _ <- sbtAlg.testCompile(repo)
-      _ <- gitAlg.push(repo, branch)
+      success <- sbtAlg.testCompile(repo).map(_ => true).recoverWith {
+        case e =>
+          logger.error(e)("failed sbt test:compile")
+          F.point(false)
+      }
+      _ <- F.whenA(success) {
+        gitAlg.push(repo, branch)
+      }
     } yield ()
 
-  def commitAndPush(data: UpdateData)(implicit F: FlatMap[F]): F[Unit] =
+  def commitAndPush(data: UpdateData)(implicit F: MonadThrowable[F]): F[Unit] =
     for {
       _ <- gitAlg.commitAll(data.repo, git.commitMsgFor(data.update))
-      _ <- gitAlg.push(data.repo, data.updateBranch)
+      success <- sbtAlg.testCompile(data.repo).map(_ => true).recoverWith {
+        case e =>
+          e.printStackTrace()
+          F.point(false)
+      }
+      _ <- F.whenA(success) {
+        gitAlg.push(data.repo, data.updateBranch)
+      }
     } yield ()
 
   def createPullRequest(data: UpdateData)(implicit F: FlatMap[F]): F[Unit] =
@@ -188,7 +203,7 @@ class NurtureAlg[F[_]](
       _ <- logger.info(msg)
     } yield result
 
-  def resetAndUpdate(data: UpdateData)(implicit F: Monad[F]): F[Unit] =
+  def resetAndUpdate(data: UpdateData)(implicit F: MonadThrowable[F]): F[Unit] =
     for {
       _ <- logger.info(s"Reset and update ${data.updateBranch.name}")
       _ <- gitAlg.resetHard(data.repo, data.baseBranch)
