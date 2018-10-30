@@ -30,19 +30,18 @@ trait ProcessAlg[F[_]] {
 }
 
 object ProcessAlg {
-  def create[F[_]](implicit F: Sync[F]): ProcessAlg[F] =
+  def create[F[_]](secretValues: List[String])(implicit F: Sync[F]): ProcessAlg[F] =
     new ProcessAlg[F] {
       override def exec(command: Nel[String], cwd: File): F[List[String]] =
         F.delay {
-          if (Seq("git", "clone").forall(command.toList contains _)) {
-            println(command.toList.map(_.split('@').last).mkString(" "))
-          } else {
-            println(command.toList.mkString(" "))
+          val escape: String => String = { value =>
+            secretValues.foldLeft(value)(_.replaceAllLiterally(_, "[SECRET_VALUE]"))
           }
+          println(command.toList.map(escape).mkString(" "))
           val lb = ListBuffer.empty[String]
           val log = new ProcessLogger {
             override def out(s: => String): Unit = {
-              val ss = s
+              val ss = escape(s)
               println(ss)
               lb.append(ss)
             }

@@ -58,13 +58,14 @@ object Context {
       config_ <- Resource.liftF(Config.default[F])
       logger_ <- Resource.liftF(Slf4jLogger.create[F])
       user_ <- Resource.liftF(config_.gitHubUser[F])
+      token = config_.gitHubTokenFile.contentAsString.trim
     } yield {
       implicit val client: Client[F] = client_
       implicit val config: Config = config_
       implicit val logger: Logger[F] = logger_
       implicit val fileAlg: FileAlg[F] = FileAlg.create[F]
       implicit val filterAlg: FilterAlg[F] = FilterAlg.create[F]
-      implicit val processAlg: ProcessAlg[F] = ProcessAlg.create[F]
+      implicit val processAlg: ProcessAlg[F] = ProcessAlg.create[F](secretValues = token :: Nil)
       implicit val user: AuthenticatedUser = user_
       implicit val workspace: File = config_.workspace
       implicit val workspaceAlg: WorkspaceAlg[F] = WorkspaceAlg.create[F]
