@@ -34,7 +34,11 @@ object ProcessAlg {
     new ProcessAlg[F] {
       override def exec(command: Nel[String], cwd: File): F[List[String]] =
         F.delay {
-          println(command.toList.mkString(" "))
+          if (Seq("git", "clone").forall(command.toList contains _)) {
+            println(command.toList.map(_.split('@').last).mkString(" "))
+          } else {
+            println(command.toList.mkString(" "))
+          }
           val lb = ListBuffer.empty[String]
           val log = new ProcessLogger {
             override def out(s: => String): Unit = {
