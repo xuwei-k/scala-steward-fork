@@ -18,10 +18,10 @@ package eu.timepit.scalasteward.nurture
 
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-
 import cats.effect.Sync
 import cats.implicits._
 import cats.FlatMap
+import cats.data.NonEmptyList
 import eu.timepit.scalasteward.application.Config
 import eu.timepit.scalasteward.git.{Branch, GitAlg}
 import eu.timepit.scalasteward.github.GitHubApiAlg
@@ -74,12 +74,14 @@ class NurtureAlg[F[_]](
       filtered <- filterAlg.localFilterMany(repo, updates)
       _ <- {
         filtered match {
+          case Nil =>
+            F.unit
           case List(update) =>
             val data = UpdateData(repo, update, baseBranch, git.branchFor(update))
             processUpdate(data)
-          case _ =>
+          case h :: t =>
             processUpdates(
-              filtered.map { update =>
+              NonEmptyList(h, t).map { update =>
                 UpdateData(repo, update, baseBranch, git.branchFor(update))
               }
             )
@@ -87,7 +89,7 @@ class NurtureAlg[F[_]](
       }
     } yield ()
 
-  def processUpdates(data: List[UpdateData])(implicit F: BracketThrowable[F]): F[Unit] =
+  def processUpdates(data: NonEmptyList[UpdateData])(implicit F: BracketThrowable[F]): F[Unit] =
     for {
       _ <- logger.info(s"Process update ${data.map(_.update.show)}")
       _ <- applyNewUpdates(data)
@@ -108,7 +110,7 @@ class NurtureAlg[F[_]](
       }
     } yield ()
 
-  def applyNewUpdates(data: List[UpdateData])(implicit F: BracketThrowable[F]): F[Unit] = {
+  def applyNewUpdates(data: NonEmptyList[UpdateData])(implicit F: BracketThrowable[F]): F[Unit] = {
     val d = data.head
     val repo = d.repo
     (editAlg.applyUpdates(repo, data.map(_.update)) >> gitAlg.containsChanges(repo))

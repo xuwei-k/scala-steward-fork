@@ -17,6 +17,7 @@
 package eu.timepit.scalasteward
 
 import better.files.File
+import cats.data.NonEmptyList
 import cats.effect.Sync
 import eu.timepit.scalasteward.io.FileAlg
 import eu.timepit.scalasteward.model.Update
@@ -29,10 +30,10 @@ object ioLegacy {
   def updateDir[F[_]: Sync](dir: File, update: Update): F[Unit] =
     FileAlg.create[F].walk(dir).filter(isSourceFile).evalMap(updateFile(_, update)).compile.drain
 
-  def updateDir[F[_]: Sync](dir: File, updates: List[Update]): F[Unit] =
+  def updateDir[F[_]: Sync](dir: File, updates: NonEmptyList[Update]): F[Unit] =
     FileAlg.create[F].walk(dir).filter(isSourceFile).evalMap(updateFile(_, updates)).compile.drain
 
-  def updateFile[F[_]](file: File, updates: List[Update])(implicit F: Sync[F]): F[File] =
+  def updateFile[F[_]](file: File, updates: NonEmptyList[Update])(implicit F: Sync[F]): F[File] =
     F.delay(
       file.write(updates.foldLeft(file.contentAsString)((a, b) => b.replaceAllIn(a).getOrElse(a)))
     )
