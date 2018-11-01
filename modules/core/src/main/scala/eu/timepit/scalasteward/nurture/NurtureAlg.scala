@@ -80,20 +80,30 @@ class NurtureAlg[F[_]](
             val data = UpdateData(repo, update, baseBranch, git.branchFor(update))
             processUpdate(data)
           case h :: t =>
-            processUpdates(
-              NonEmptyList(h, t).map { update =>
-                UpdateData(repo, update, baseBranch, git.branchFor(update))
+            for {
+              success <- processUpdates(
+                NonEmptyList(h, t).map { update =>
+                  UpdateData(repo, update, baseBranch, git.branchFor(update))
+                }
+              )
+              _ <- if (success) {
+                F.unit
+              } else {
+                filtered.traverse_ { update =>
+                  val data = UpdateData(repo, update, baseBranch, git.branchFor(update))
+                  processUpdate(data)
+                }
               }
-            )
+            } yield ()
         }
       }
     } yield ()
 
-  def processUpdates(data: NonEmptyList[UpdateData])(implicit F: BracketThrowable[F]): F[Unit] =
+  def processUpdates(data: NonEmptyList[UpdateData])(implicit F: BracketThrowable[F]): F[Boolean] =
     for {
       _ <- logger.info(s"Process update ${data.map(_.update.show)}")
-      _ <- applyNewUpdates(data)
-    } yield ()
+      success <- applyNewUpdates(data)
+    } yield success
 
   def processUpdate(data: UpdateData)(implicit F: BracketThrowable[F]): F[Unit] =
     for {
@@ -110,7 +120,9 @@ class NurtureAlg[F[_]](
       }
     } yield ()
 
-  def applyNewUpdates(data: NonEmptyList[UpdateData])(implicit F: BracketThrowable[F]): F[Unit] = {
+  def applyNewUpdates(
+      data: NonEmptyList[UpdateData]
+  )(implicit F: BracketThrowable[F]): F[Boolean] = {
     val d = data.head
     val repo = d.repo
     (editAlg.applyUpdates(repo, data.map(_.update)) >> gitAlg.containsChanges(repo))
@@ -120,10 +132,12 @@ class NurtureAlg[F[_]](
           for {
             _ <- logger.info(s"Create branch ${data.map(_.updateBranch)}")
             _ <- gitAlg.createBranch(repo, branch)
-            _ <- commitAndPush(repo, "update dependencies", branch)
-          } yield ()
-        },
-        logger.warn("No files were changed")
+            success <- commitAndPush(repo, "update dependencies", branch)
+          } yield success
+        }, {
+          logger.warn("No files were changed")
+          F.point(true)
+        }
       )
   }
 
@@ -141,7 +155,7 @@ class NurtureAlg[F[_]](
 
   def commitAndPush(repo: Repo, message: String, branch: Branch)(
       implicit F: MonadThrowable[F]
-  ): F[Unit] =
+  ): F[Boolean] =
     for {
       _ <- gitAlg.commitAll(repo, message)
       success <- sbtAlg.testCompile(repo).map(_ => true).recoverWith {
@@ -152,7 +166,7 @@ class NurtureAlg[F[_]](
       _ <- F.whenA(success) {
         gitAlg.push(repo, branch)
       }
-    } yield ()
+    } yield success
 
   def commitAndPush(data: UpdateData)(implicit F: MonadThrowable[F]): F[Unit] =
     for {
