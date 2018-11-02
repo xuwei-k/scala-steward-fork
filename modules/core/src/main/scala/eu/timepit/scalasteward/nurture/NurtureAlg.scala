@@ -134,9 +134,15 @@ class NurtureAlg[F[_]](
           for {
             _ <- logger.info(s"Create branch ${branch.name}")
             _ <- gitAlg.createBranch(repo, branch)
-            success <- commitAndPush(repo, "update dependencies", branch)
+            message = "Update dependencies"
+            success <- commitAndPush(repo, message, branch)
             _ <- if (success) {
-              createPullRequest(baseBranch = d.baseBranch, repo = repo, branch = branch)
+              createPullRequest(
+                baseBranch = d.baseBranch,
+                repo = repo,
+                branch = branch,
+                message = message
+              )
             } else {
               F.unit
             }
@@ -158,7 +164,8 @@ class NurtureAlg[F[_]](
           _ <- createPullRequest(
             baseBranch = data.baseBranch,
             repo = data.repo,
-            branch = data.updateBranch
+            branch = data.updateBranch,
+            message = git.commitMsgFor(data.update)
           )
         } yield ()
       },
@@ -193,13 +200,13 @@ class NurtureAlg[F[_]](
       }
     } yield ()
 
-  def createPullRequest(baseBranch: Branch, repo: Repo, branch: Branch)(
+  def createPullRequest(baseBranch: Branch, repo: Repo, branch: Branch, message: String)(
       implicit F: FlatMap[F]
   ): F[Unit] =
     for {
       _ <- logger.info(s"Create PR ${branch.name}")
       requestData = NewPullRequestData.from(
-        message = "",
+        message = message,
         headBranch = branch,
         baseBranch = baseBranch,
         login = config.gitHubLogin

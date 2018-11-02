@@ -54,6 +54,7 @@ class Http4sGitHubApiAlg[F[_]](
   ): F[PullRequestOut] =
     http4sUrl.pulls[F](repo).flatMap { uri =>
       val req = Request[F](POST, uri).withEntity(data)
+      println((req, req.bodyAsText, uri, data))
       expectJsonOf[PullRequestOut](req)
     }
 
@@ -76,7 +77,9 @@ class Http4sGitHubApiAlg[F[_]](
     }
 
   def expectJsonOf[A: Decoder](req: Request[F]): F[A] =
-    client.expect[A](authenticate(user)(req))(jsonOf)
+    client.expectOr[A](authenticate(user)(req))(res => {
+      println((res, res.bodyAsText)); F.point(new RuntimeException(res.toString))
+    })(jsonOf)
 }
 
 object Http4sGitHubApiAlg {
