@@ -29,8 +29,11 @@ object logger {
         implicit F: MonadThrowable[F]
     ): F[Either[Throwable, A]] =
       self.info(message) >> fa.attempt.flatTap {
-        case Left(t)  => self.error(t)(s"$message failed")
-        case Right(_) => F.unit
+        case Left(t) =>
+          t.printStackTrace()
+          self.error(t)(s"$message failed")
+        case Right(_) =>
+          F.unit
       }
 
     def attemptLog_[A](message: String)(fa: F[A])(implicit F: MonadThrowable[F]): F[Unit] =
