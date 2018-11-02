@@ -89,7 +89,11 @@ class NurtureAlg[F[_]](
               } else {
                 filtered.traverse_ { update =>
                   val data = UpdateData(repo, update, baseBranch, git.branchFor(update))
-                  processUpdate(data)
+                  processUpdate(data).recover {
+                    case e =>
+                      println(e)
+                      ()
+                  }
                 }
               }
             } yield ()
