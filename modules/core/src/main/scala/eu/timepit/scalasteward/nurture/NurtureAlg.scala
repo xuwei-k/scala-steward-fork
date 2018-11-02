@@ -128,7 +128,7 @@ class NurtureAlg[F[_]](
         gitAlg.returnToCurrentBranch(repo) {
           val branch = Branch(
             data.toList
-              .map(d => s"${d.update.artifactId}-${d.update.nextVersion}")
+              .map(d => s"${d.update.name}-${d.update.nextVersion}")
               .mkString("update-", "-", "")
           )
           for {
