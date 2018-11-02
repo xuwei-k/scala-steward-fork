@@ -21,6 +21,7 @@ import cats.implicits._
 import eu.timepit.scalasteward.application.Context
 import eu.timepit.scalasteward.github.data.Repo
 import eu.timepit.scalasteward.util.logger.LoggerOps
+import scala.util.Random
 
 object steward extends IOApp {
   override def run(args: List[String]): IO[ExitCode] =
@@ -48,7 +49,7 @@ object steward extends IOApp {
 
   def getRepos(repos: List[String]): List[Repo] =
     if (repos.isEmpty) {
-      List(
+      val defaultRepos = List(
         Repo("xuwei-k", "scalikejdbc-flyway-sbt-example"),
         Repo("xuwei-k", "mima-web"),
         Repo("xuwei-k", "favorite_typo"),
@@ -98,6 +99,7 @@ object steward extends IOApp {
         Repo("scalapb-json", "protoc-lint"),
         Repo("scalapb-json", "scalapb-json-common")
       )
+      Random.shuffle(defaultRepos)
     } else {
       repos.map { name =>
         val Array(user, repo) = name.split('/')
