@@ -6,7 +6,10 @@ scala:
 cache:
   directories:
   - "$HOME/.ivy2/cache"
-  - "$HOME/.sbt/boot/"
+  - "$HOME/.sbt/launchers"
+before_cache:
+- find $HOME/.ivy2/cache -name "ivydata-*.properties" | xargs rm
+- find $HOME/.ivy2/cache -name "*SNAPSHOT*" | xargs rm -rf
 script:
 - sbt "++ ${TRAVIS_SCALA_VERSION}" core/run
 env:
