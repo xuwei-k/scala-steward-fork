@@ -47,6 +47,13 @@ object steward extends IOApp {
   def getRepos(repos: List[String]): List[Repo] =
     if (repos.isEmpty) {
       List(
+        Repo("scalaprops", "scalaprops"),
+        Repo("scalaprops", "scalaprops-native-example"),
+        Repo("scalaprops", "scalaprops-examples"),
+        Repo("scalaprops", "scalaprops-cross-example"),
+        Repo("scalaprops", "scalaprops-magnolia"),
+        Repo("scalaprops", "scalaprops-shapeless"),
+        Repo("scalaprops", "sbt-scalaprops"),
         Repo("msgpack4z", "msgpack4z-core"),
         Repo("msgpack4z", "msgpack4z-native"),
         Repo("msgpack4z", "msgpack4z-circe"),
