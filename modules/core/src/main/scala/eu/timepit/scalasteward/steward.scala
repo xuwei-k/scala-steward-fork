@@ -38,7 +38,9 @@ object steward extends IOApp {
           //user <- ctx.config.gitHubUser[IO]
           //_ <- repos.traverse(ctx.dependencyService.forkAndCheckDependencies(user, _))
           //_ <- ctx.updateService.checkForUpdates
-          _ <- repos.traverse_(ctx.gitHubApiAlg.createFork)
+          _ <- repos
+            .filterNot(_.owner === ctx.config.gitHubLogin)
+            .traverse_(ctx.gitHubApiAlg.createFork)
           _ = Thread.sleep(5000)
           _ <- repos.traverse_(ctx.nurtureAlg.nurture)
         } yield ExitCode.Success
