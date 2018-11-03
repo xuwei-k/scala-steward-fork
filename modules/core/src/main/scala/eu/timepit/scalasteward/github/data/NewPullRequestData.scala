@@ -61,9 +61,7 @@ object NewPullRequestData {
     NewPullRequestData(
       title = message,
       body = "",
-      head = {
-        s"$login:${headBranch.name}"
-      },
+      head = s"$login:${headBranch.name}",
       base = baseBranch
     )
 }
