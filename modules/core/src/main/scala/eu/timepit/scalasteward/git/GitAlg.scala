@@ -39,6 +39,8 @@ trait GitAlg[F[_]] {
 
   def createBranch(repo: Repo, branch: Branch): F[Unit]
 
+  def deleteBranch(repo: Repo, branch: Branch): F[Unit]
+
   def currentBranch(repo: Repo): F[Branch]
 
   def isBehind(repo: Repo, branch: Branch, base: Branch): F[Boolean]
@@ -108,6 +110,12 @@ object GitAlg {
         for {
           repoDir <- workspaceAlg.repoDir(repo)
           _ <- exec(Nel.of("checkout", "-b", branch.name), repoDir)
+        } yield ()
+
+      def deleteBranch(repo: Repo, branch: Branch): F[Unit] =
+        for {
+          repoDir <- workspaceAlg.repoDir(repo)
+          _ <- exec(Nel.of("branch", "-D", branch.name), repoDir)
         } yield ()
 
       override def currentBranch(repo: Repo): F[Branch] =

@@ -18,7 +18,7 @@ package eu.timepit.scalasteward.nurture
 
 import cats.effect.Sync
 import cats.implicits._
-import cats.FlatMap
+import cats.{ApplicativeError, FlatMap}
 import cats.data.NonEmptyList
 import eu.timepit.scalasteward.application.Config
 import eu.timepit.scalasteward.git.{Branch, GitAlg}
@@ -64,6 +64,13 @@ class NurtureAlg[F[_]](
       _ <- gitAlg.syncFork(repo, parent.clone_url, parent.default_branch)
     } yield parent.default_branch
 
+  private[this] def ignoreError[E](f: F[Unit])(implicit F: ApplicativeError[F, E]): F[Unit] =
+    f.recover {
+      case e =>
+        println(e)
+        ()
+    }
+
   def updateDependencies(repo: Repo, baseBranch: Branch)(implicit F: BracketThrowable[F]): F[Unit] =
     for {
       _ <- logger.info(s"Check updates for ${repo.show}")
@@ -71,6 +78,11 @@ class NurtureAlg[F[_]](
       _ <- logger.info(util.logger.showUpdates(updates))
       filtered <- filterAlg.localFilterMany(repo, updates)
       _ <- {
+        def deleteBranches(updates: List[UpdateData]): F[Unit] =
+          updates.traverse_ { u =>
+            ignoreError(gitAlg.deleteBranch(repo, u.updateBranch))
+          }
+
         filtered match {
           case Nil =>
             F.unit
@@ -84,34 +96,33 @@ class NurtureAlg[F[_]](
                   UpdateData(repo, update, baseBranch, git.branchFor(update))
                 }
               )
-              _ <- if (success) {
-                F.unit
-              } else {
-                val dataList = filtered.map { update =>
-                  UpdateData(repo, update, baseBranch, git.branchFor(update))
-                }
-
-                if (filtered.size == 2) {
-                  dataList.traverse_ { data =>
-                    processUpdate(data).recover {
-                      case e =>
-                        println(e)
-                        ()
+              _ <- F.whenA(!success) {
+                for {
+                  _ <- ignoreError(gitAlg.deleteBranch(repo, git.branchFor(filtered: _*)))
+                  dataList = filtered.map { update =>
+                    UpdateData(repo, update, baseBranch, git.branchFor(update))
+                  }
+                  _ <- {
+                    if (filtered.size == 2) {
+                      dataList.traverse_ { data =>
+                        ignoreError(processUpdate(data))
+                      }
+                    } else {
+                      for {
+                        successUpdates <- dataList.filterA(applyAndCheck)
+                        _ <- deleteBranches(successUpdates)
+                        _ <- successUpdates match {
+                          case Nil =>
+                            F.unit
+                          case x :: Nil =>
+                            processUpdate(x)
+                          case x :: xs =>
+                            processUpdates(NonEmptyList(x, xs))
+                        }
+                      } yield ()
                     }
                   }
-                } else {
-                  for {
-                    successUpdates <- dataList.filterA(applyAndCheck)
-                    _ <- successUpdates match {
-                      case Nil =>
-                        F.unit
-                      case x :: Nil =>
-                        processUpdate(x)
-                      case x :: xs =>
-                        processUpdates(NonEmptyList(x, xs))
-                    }
-                  } yield ()
-                }
+                } yield ()
               }
             } yield ()
         }
