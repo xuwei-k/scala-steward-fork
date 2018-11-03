@@ -142,11 +142,20 @@ object steward extends IOApp {
     Repo("unfiltered", "unfiltered-war.g8"),
     Repo("unfiltered", "unfiltered-slick.g8"),
     Repo("json4s", "json4s"),
+    Repo("wartremover", "wartremover"),
+    Repo("wartremover", "wartremover-contrib"),
+    Repo("wartremover", "own-wart-example"),
+    Repo("scopt", "scopt"),
+    Repo("scalaj", "scalaj-http"),
+    Repo("scalikejdbc", "ddd-repository-example"),
+    Repo("scalikejdbc", "scalikejdbc"),
+    Repo("skinny-framework", "skinny-micro"),
     Repo("scalate", "scalate"),
     Repo("scalatra", "scalamd"),
     Repo("scalatra", "sbt-scalatra"),
     Repo("scalatra", "scalatra.g8"),
     Repo("sbt", "sbt-protobuf"),
+    Repo("scalapb", "scalapb-json4s"),
     Repo("scalapb", "ScalaPB")
   ).distinct.map(_.copy(createPullRequest = false))
 
