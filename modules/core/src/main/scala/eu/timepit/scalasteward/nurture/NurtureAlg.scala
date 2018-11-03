@@ -120,8 +120,12 @@ class NurtureAlg[F[_]](
 
   def processUpdates(data: NonEmptyList[UpdateData])(implicit F: BracketThrowable[F]): F[Boolean] =
     for {
-      _ <- logger.info(s"Process update ${data.map(_.update.show)}")
-      success <- applyNewUpdates(data)
+      _ <- logger.info(s"Process updates ${data.map(_.update.show)}")
+      b = git.branchFor(data.toList.map(_.update): _*)
+      success <- (gitHubApiAlg.getBranch(data.head.repo, b) >> F.point(false)).recoverWith {
+        case e =>
+          logger.info(e.toString) >> applyNewUpdates(data)
+      }
     } yield success
 
   def processUpdate(data: UpdateData)(implicit F: BracketThrowable[F]): F[Unit] =
