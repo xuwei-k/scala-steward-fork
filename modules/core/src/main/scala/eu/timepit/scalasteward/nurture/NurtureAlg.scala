@@ -87,13 +87,30 @@ class NurtureAlg[F[_]](
               _ <- if (success) {
                 F.unit
               } else {
-                filtered.traverse_ { update =>
-                  val data = UpdateData(repo, update, baseBranch, git.branchFor(update))
-                  processUpdate(data).recover {
-                    case e =>
-                      println(e)
-                      ()
+                val dataList = filtered.map { update =>
+                  UpdateData(repo, update, baseBranch, git.branchFor(update))
+                }
+
+                if (filtered.size == 2) {
+                  dataList.traverse_ { data =>
+                    processUpdate(data).recover {
+                      case e =>
+                        println(e)
+                        ()
+                    }
                   }
+                } else {
+                  for {
+                    successUpdates <- dataList.filterA(applyAndCheck)
+                    _ <- successUpdates match {
+                      case Nil =>
+                        F.unit
+                      case x :: Nil =>
+                        processUpdate(x)
+                      case x :: xs =>
+                        processUpdates(NonEmptyList(x, xs))
+                    }
+                  } yield ()
                 }
               }
             } yield ()
@@ -158,20 +175,32 @@ class NurtureAlg[F[_]](
       )
   }
 
-  def applyNewUpdate(data: UpdateData)(implicit F: BracketThrowable[F]): F[Unit] =
+  def applyNewUpdate(data: UpdateData)(implicit F: BracketThrowable[F]): F[Boolean] =
+    for {
+      success <- applyAndCheck(data)
+      _ <- {
+        if (success) {
+          for {
+            _ <- pushToGitHub(data)
+            _ <- createPullRequest(
+              baseBranch = data.baseBranch,
+              repo = data.repo,
+              branch = data.updateBranch,
+              message = git.commitMsgFor(data.update)
+            )
+          } yield ()
+        } else F.unit
+      }
+    } yield success
+
+  def applyAndCheck(data: UpdateData)(implicit F: BracketThrowable[F]): F[Boolean] =
     (editAlg.applyUpdate(data.repo, data.update) >> gitAlg.containsChanges(data.repo)).ifM(
       gitAlg.returnToCurrentBranch(data.repo) {
         for {
           _ <- logger.info(s"Create branch ${data.updateBranch.name}")
           _ <- gitAlg.createBranch(data.repo, data.updateBranch)
-          _ <- commitAndPush(data)
-          _ <- createPullRequest(
-            baseBranch = data.baseBranch,
-            repo = data.repo,
-            branch = data.updateBranch,
-            message = git.commitMsgFor(data.update)
-          )
-        } yield ()
+          success <- commitAndCheck(data)
+        } yield success
       },
       logger.warn("No files were changed") >> F.point(false)
     )
@@ -191,6 +220,12 @@ class NurtureAlg[F[_]](
     } yield success
 
   def commitAndPush(data: UpdateData)(implicit F: MonadThrowable[F]): F[Unit] =
+    commitAndCheck(data).ifM(pushToGitHub(data), F.unit)
+
+  def pushToGitHub(data: UpdateData): F[Unit] =
+    gitAlg.push(data.repo, data.updateBranch)
+
+  def commitAndCheck(data: UpdateData)(implicit F: MonadThrowable[F]): F[Boolean] =
     for {
       _ <- gitAlg.commitAll(data.repo, git.commitMsgFor(data.update))
       success <- sbtAlg.testCompile(data.repo).map(_ => true).recoverWith {
@@ -198,10 +233,7 @@ class NurtureAlg[F[_]](
           e.printStackTrace()
           logger.error(e)("sbt test:compile fail") >> F.point(false)
       }
-      _ <- F.whenA(success) {
-        gitAlg.push(data.repo, data.updateBranch)
-      }
-    } yield ()
+    } yield success
 
   def createPullRequest(baseBranch: Branch, repo: Repo, branch: Branch, message: String)(
       implicit F: FlatMap[F]
