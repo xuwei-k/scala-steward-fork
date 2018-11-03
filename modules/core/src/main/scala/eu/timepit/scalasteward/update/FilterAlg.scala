@@ -43,6 +43,11 @@ object FilterAlg {
     new FilterAlg[F] {
       def globalKeep(update: Update): Boolean =
         (update.groupId, update.artifactId, update.nextVersion) match {
+          // squeryl
+          case ("mysql", "mysql-connector-java", "8.0.13") => false
+          case ("org.postgresql", "postgresql", "42.1.4")  => false
+          case ("org.apache.derby", "derby", "10.14.2.0")  => false
+
           case ("org.scala-lang", "scala-compiler", _) => false
           case ("org.scala-lang", "scala-library", _)  => false
 

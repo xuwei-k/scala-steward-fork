@@ -29,7 +29,9 @@ object steward extends IOApp {
       ctx.logger.infoTotalTime {
         val repos = getRepos(args)
 
-        println(repos)
+        val (x, y) = repos.partition(_.createPullRequest)
+        println(("create pull req", x.map(_.show)))
+        println(("create branch", y.map(_.show)))
 
         for {
           _ <- prepareEnv(ctx)
@@ -114,7 +116,40 @@ object steward extends IOApp {
     Repo("scalapb-json", "scalapb-argonaut"),
     Repo("scalapb-json", "protoc-lint"),
     Repo("scalapb-json", "scalapb-json-common")
-  )
+  ).distinct.map(_.copy(createPullRequest = true))
+
+  val anotherRepos = List(
+    Repo("foundweekends", "giter8"),
+    Repo("foundweekends", "knockoff"),
+    Repo("foundweekends", "conscript"),
+    Repo("foundweekends", "pamflet"),
+    Repo("scalaz", "scalaz"),
+    Repo("argonaut-io", "argonaut"),
+    Repo("squeryl", "squeryl"),
+    Repo("gitbucket", "gitbucket"),
+    Repo("nscala-time", "nscala-time"),
+    Repo("dwango", "S99"),
+    Repo("dwango", "slack-webhook-appender"),
+    Repo("unfiltered", "unfiltered"),
+    Repo("unfiltered", "website"),
+    Repo("unfiltered", "unfiltered-websockets.g8"),
+    Repo("unfiltered", "unfiltered-netty.g8"),
+    Repo("unfiltered", "unfiltered-gae.g8"),
+    Repo("unfiltered", "unfiltered.g8"),
+    Repo("unfiltered", "unfiltered-scalate.g8"),
+    Repo("unfiltered", "coffee-filter.g8"),
+    Repo("unfiltered", "unfiltered-war.g8"),
+    Repo("unfiltered", "unfiltered-slick.g8"),
+    Repo("json4s", "json4s"),
+    Repo("scalate", "scalate"),
+    Repo("scalatra", "scalamd"),
+    Repo("scalatra", "sbt-scalatra"),
+    Repo("scalatra", "scalatra.g8"),
+    Repo("sbt", "sbt-protobuf"),
+    Repo("scalapb", "ScalaPB")
+  ).distinct.map(_.copy(createPullRequest = false))
+
+  val repositories = defaultRepos ::: anotherRepos
 
   def partial[A](x: Int, y: Int, values: List[A]): List[A] = {
     val n = values.size / y.toDouble
@@ -124,9 +159,9 @@ object steward extends IOApp {
   def getRepos(args: List[String]): List[Repo] =
     args match {
       case Nil =>
-        Random.shuffle(defaultRepos)
+        Random.shuffle(repositories)
       case Seq(RunPartial((x, y))) =>
-        partial(x, y, defaultRepos)
+        partial(x, y, repositories)
       case repos =>
         repos.map { name =>
           val Array(user, repo) = name.split('/')

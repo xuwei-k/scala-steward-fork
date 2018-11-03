@@ -233,17 +233,21 @@ class NurtureAlg[F[_]](
   def createPullRequest(baseBranch: Branch, repo: Repo, branch: Branch, message: String)(
       implicit F: FlatMap[F]
   ): F[Unit] =
-    for {
-      _ <- logger.info(s"Create PR ${branch.name}")
-      requestData = NewPullRequestData.from(
-        message = message,
-        headBranch = branch,
-        baseBranch = baseBranch,
-        login = config.gitHubLogin
-      )
-      pullRequest <- gitHubApiAlg.createPullRequest(repo, requestData)
-      _ <- logger.info(s"Created PR ${pullRequest.html_url}")
-    } yield ()
+    if (repo.createPullRequest) {
+      for {
+        _ <- logger.info(s"Create PR ${branch.name}")
+        requestData = NewPullRequestData.from(
+          message = message,
+          headBranch = branch,
+          baseBranch = baseBranch,
+          login = config.gitHubLogin
+        )
+        pullRequest <- gitHubApiAlg.createPullRequest(repo, requestData)
+        _ <- logger.info(s"Created PR ${pullRequest.html_url}")
+      } yield ()
+    } else {
+      logger.info(s"skip create PR for ${repo.show}")
+    }
 
   def updatePullRequest(data: UpdateData)(implicit F: BracketThrowable[F]): F[Unit] =
     gitAlg.returnToCurrentBranch(data.repo) {
