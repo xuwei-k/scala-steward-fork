@@ -218,7 +218,7 @@ class NurtureAlg[F[_]](
           logger.error(e)(s"failed sbt ${repo.testCommands.mkString(" ")}") >> F.point(false)
       }
       _ <- F.whenA(success) {
-        gitAlg.push(repo, branch)
+        gitAlg.push(repo, branch, force = false)
       }
     } yield success
 
@@ -226,7 +226,7 @@ class NurtureAlg[F[_]](
     commitAndCheck(data).ifM(pushToGitHub(data), F.unit)
 
   def pushToGitHub(data: UpdateData): F[Unit] =
-    gitAlg.push(data.repo, data.updateBranch)
+    gitAlg.push(data.repo, data.updateBranch, force = false)
 
   def commitAndCheck(data: UpdateData)(implicit F: MonadThrowable[F]): F[Boolean] =
     for {
