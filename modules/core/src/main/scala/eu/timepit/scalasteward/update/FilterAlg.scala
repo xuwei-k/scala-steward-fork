@@ -41,6 +41,11 @@ trait FilterAlg[F[_]] {
 object FilterAlg {
   def create[F[_]](implicit logger: Logger[F], F: Applicative[F]): FilterAlg[F] =
     new FilterAlg[F] {
+      object ScalazVersions {
+        def unapply(value: String): Boolean =
+          !(value.startsWith("7.3") || value.startsWith("8"))
+      }
+
       def globalKeep(update: Update): Boolean =
         (update.groupId, update.artifactId, update.nextVersion) match {
           // squeryl
@@ -49,6 +54,8 @@ object FilterAlg {
           case ("org.apache.derby", "derby", "10.14.2.0")  => false
 
           case ("org.scala-sbt", "sbt-launch", _) => false
+
+          case ("org.scalaz", _, ScalazVersions()) => false
 
           case ("org.scala-lang", "scala-compiler", _) => false
           case ("org.scala-lang", "scala-library", _)  => false
