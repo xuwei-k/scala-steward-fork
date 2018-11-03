@@ -57,6 +57,8 @@ object FilterAlg {
 
           case ("org.scalaz", _, ScalazVersions()) => false
 
+          case ("com.geirsson", a, _) if a.startsWith("scalafmt-core") => false
+
           case ("org.scala-lang", "scala-compiler", _) => false
           case ("org.scala-lang", "scala-library", _)  => false
 
