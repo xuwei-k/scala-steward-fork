@@ -157,8 +157,13 @@ object steward extends IOApp {
   val repositories = (defaultRepos ::: anotherRepos).sortBy(_.show) ::: lasts
 
   def partial[A](x: Int, y: Int, values: List[A]): List[A] = {
-    val n = values.size / y.toDouble
-    values.drop((x * n).toInt).take(n.toInt + 1)
+    val n0 = math.max(values.size / y, 0)
+    val n = if (values.size % y == 0) n0 else n0 + 1
+    if (x >= y) {
+      values.drop(x * n)
+    } else {
+      values.drop(x * n).take(n)
+    }
   }
 
   def getRepos(args: List[String]): List[Repo] =

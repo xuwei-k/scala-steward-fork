@@ -9,11 +9,11 @@ object StewardProps extends Properties("steward") {
       x <- Gen.chooseNum(1, values.size)
     } yield (x, values)
 
-  property("partial") = Prop.forAll(g[Int]) {
+  property("partial") = Prop.forAllNoShrink(g[Int]) {
     case (y, values) =>
       val z = (0 until y).map { x =>
         steward.partial(x, y, values)
       }
-      z.flatten.toSet == values.toSet
+      z.flatten == values
   }
 }
