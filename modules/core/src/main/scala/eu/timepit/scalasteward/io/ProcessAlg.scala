@@ -37,7 +37,8 @@ object ProcessAlg {
           val escape: String => String = { value =>
             secretValues.foldLeft(value)(_.replaceAllLiterally(_, "[SECRET_VALUE]"))
           }
-          println(command.toList.map(escape).mkString(" "))
+          val escapedCommand = command.toList.map(escape).mkString(" ")
+          println(escapedCommand)
           val lb = ListBuffer.empty[String]
           val log = new ProcessLogger {
             override def out(s: => String): Unit = {
@@ -50,7 +51,7 @@ object ProcessAlg {
             override def buffer[T](f: => T): T = f
           }
           val exitCode = Process(command.toList, cwd.toJava).!(log)
-          if (exitCode != 0) throw new IOException(lb.mkString("\n"))
+          if (exitCode != 0) throw new IOException(lb.mkString(escapedCommand + "\n\n", "\n", ""))
           lb.result()
         }
 

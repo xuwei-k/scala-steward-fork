@@ -153,8 +153,7 @@ class NurtureAlg[F[_]](
             }
           } yield success
         }, {
-          logger.warn("No files were changed")
-          F.point(true)
+          logger.warn("No files were changed") >> F.point(true)
         }
       )
   }
@@ -174,7 +173,7 @@ class NurtureAlg[F[_]](
           )
         } yield ()
       },
-      logger.warn("No files were changed")
+      logger.warn("No files were changed") >> F.point(false)
     )
 
   def commitAndPush(repo: Repo, message: String, branch: Branch)(
@@ -184,8 +183,7 @@ class NurtureAlg[F[_]](
       _ <- gitAlg.commitAll(repo, message)
       success <- sbtAlg.testCompile(repo).map(_ => true).recoverWith {
         case e =>
-          logger.error(e)("failed sbt test:compile")
-          F.point(false)
+          logger.error(e)("failed sbt test:compile") >> F.point(false)
       }
       _ <- F.whenA(success) {
         gitAlg.push(repo, branch)
@@ -198,7 +196,7 @@ class NurtureAlg[F[_]](
       success <- sbtAlg.testCompile(data.repo).map(_ => true).recoverWith {
         case e =>
           e.printStackTrace()
-          F.point(false)
+          logger.error(e)("sbt test:compile fail") >> F.point(false)
       }
       _ <- F.whenA(success) {
         gitAlg.push(data.repo, data.updateBranch)
