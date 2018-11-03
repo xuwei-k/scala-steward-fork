@@ -147,12 +147,7 @@ class NurtureAlg[F[_]](
     (editAlg.applyUpdates(repo, data.map(_.update)) >> gitAlg.containsChanges(repo))
       .ifM(
         gitAlg.returnToCurrentBranch(repo) {
-          val branch = Branch(
-            data.toList
-              .sortBy(d => (d.update.name, d.update.nextVersion))
-              .map(d => s"${d.update.name}-${d.update.nextVersion}")
-              .mkString("update-", "-", "")
-          )
+          val branch = git.branchFor(data.map(_.update).toList: _*)
           for {
             _ <- logger.info(s"Create branch ${branch.name}")
             _ <- gitAlg.createBranch(repo, branch)
