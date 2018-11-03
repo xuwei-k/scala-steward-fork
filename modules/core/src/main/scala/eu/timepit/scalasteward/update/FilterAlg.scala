@@ -48,6 +48,8 @@ object FilterAlg {
           case ("org.postgresql", "postgresql", "42.1.4")  => false
           case ("org.apache.derby", "derby", "10.14.2.0")  => false
 
+          case ("org.scala-sbt", "sbt-launch", "0.99.4") => false
+
           case ("org.scala-lang", "scala-compiler", _) => false
           case ("org.scala-lang", "scala-library", _)  => false
 
