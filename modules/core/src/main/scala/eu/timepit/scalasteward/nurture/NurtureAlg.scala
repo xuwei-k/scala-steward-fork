@@ -148,30 +148,34 @@ class NurtureAlg[F[_]](
   )(implicit F: BracketThrowable[F]): F[Boolean] = {
     val d = data.head
     val repo = d.repo
-    (editAlg.applyUpdates(repo, data.map(_.update)) >> gitAlg.containsChanges(repo))
-      .ifM(
-        gitAlg.returnToCurrentBranch(repo) {
-          val branch = git.branchFor(data.map(_.update).toList: _*)
-          for {
-            _ <- logger.info(s"Create branch ${branch.name}")
-            _ <- gitAlg.createBranch(repo, branch)
-            message = "Update dependencies"
-            success <- commitAndPush(repo, message, branch)
-            _ <- if (success) {
-              createPullRequest(
-                baseBranch = d.baseBranch,
-                repo = repo,
-                branch = branch,
-                message = message
-              )
-            } else {
-              F.unit
-            }
-          } yield success
-        }, {
-          logger.warn("No files were changed") >> F.point(true)
-        }
-      )
+    for {
+      result <- editAlg.applyUpdates(repo, data.map(_.update)).map(_.toSet)
+      s <- gitAlg
+        .containsChanges(repo)
+        .ifM(
+          gitAlg.returnToCurrentBranch(repo) {
+            val branch = git.branchFor(data.map(_.update).filterNot(result): _*)
+            for {
+              _ <- logger.info(s"Create branch ${branch.name}")
+              _ <- gitAlg.createBranch(repo, branch)
+              message = "Update dependencies"
+              success <- commitAndPush(repo, message, branch)
+              _ <- if (success) {
+                createPullRequest(
+                  baseBranch = d.baseBranch,
+                  repo = repo,
+                  branch = branch,
+                  message = message
+                )
+              } else {
+                F.unit
+              }
+            } yield success
+          }, {
+            logger.warn("No files were changed") >> F.point(true)
+          }
+        )
+    } yield s
   }
 
   def applyNewUpdate(data: UpdateData)(implicit F: BracketThrowable[F]): F[Boolean] =

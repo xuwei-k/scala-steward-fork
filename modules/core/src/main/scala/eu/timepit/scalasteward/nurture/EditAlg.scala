@@ -26,7 +26,7 @@ import eu.timepit.scalasteward.model.Update
 
 trait EditAlg[F[_]] {
   def applyUpdate(repo: Repo, update: Update): F[Unit]
-  def applyUpdates(repo: Repo, updates: NonEmptyList[Update]): F[Unit]
+  def applyUpdates(repo: Repo, updates: NonEmptyList[Update]): F[List[Update]]
 }
 
 object EditAlg {
@@ -40,7 +40,7 @@ object EditAlg {
         workspaceAlg.repoDir(repo).flatMap { repoDir =>
           ioLegacy.updateDir(repoDir, update)
         }
-      def applyUpdates(repo: Repo, updates: NonEmptyList[Update]): F[Unit] =
+      def applyUpdates(repo: Repo, updates: NonEmptyList[Update]): F[List[Update]] =
         workspaceAlg.repoDir(repo).flatMap { repoDir =>
           ioLegacy.updateDir(repoDir, updates)
         }
