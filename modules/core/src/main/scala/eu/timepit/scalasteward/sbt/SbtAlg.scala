@@ -30,7 +30,7 @@ import eu.timepit.scalasteward.sbtLegacy
 import io.chrisdavenport.log4cats.Logger
 
 trait SbtAlg[F[_]] {
-  def testCompile(repo: Repo): F[Unit]
+  def run(repo: Repo): F[Unit]
 
   def addGlobalPlugin(plugin: FileData): F[Unit]
 
@@ -104,10 +104,10 @@ object SbtAlg {
           }
         }
 
-      def testCompile(repo: Repo): F[Unit] =
+      def run(repo: Repo): F[Unit] =
         for {
           repoDir <- workspaceAlg.repoDir(repo)
-          cmd = sbtCmd("test:compile")
+          cmd = sbtCmd(repo.testCommands: _*)
           _ <- ignoreOptsFiles(repoDir)(processAlg.execSandboxed(cmd, repoDir))
         } yield ()
     }

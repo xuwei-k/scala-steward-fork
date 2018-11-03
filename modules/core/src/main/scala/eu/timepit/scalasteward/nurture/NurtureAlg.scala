@@ -205,9 +205,9 @@ class NurtureAlg[F[_]](
   ): F[Boolean] =
     for {
       _ <- gitAlg.commitAll(repo, message)
-      success <- sbtAlg.testCompile(repo).map(_ => true).recoverWith {
+      success <- sbtAlg.run(repo).map(_ => true).recoverWith {
         case e =>
-          logger.error(e)("failed sbt test:compile") >> F.point(false)
+          logger.error(e)(s"failed sbt ${repo.testCommands.mkString(" ")}") >> F.point(false)
       }
       _ <- F.whenA(success) {
         gitAlg.push(repo, branch)
@@ -223,10 +223,10 @@ class NurtureAlg[F[_]](
   def commitAndCheck(data: UpdateData)(implicit F: MonadThrowable[F]): F[Boolean] =
     for {
       _ <- gitAlg.commitAll(data.repo, git.commitMsgFor(data.update))
-      success <- sbtAlg.testCompile(data.repo).map(_ => true).recoverWith {
+      success <- sbtAlg.run(data.repo).map(_ => true).recoverWith {
         case e =>
           e.printStackTrace()
-          logger.error(e)("sbt test:compile fail") >> F.point(false)
+          logger.error(e)(s"sbt ${data.repo.testCommands.mkString(" ")} fail") >> F.point(false)
       }
     } yield success
 
