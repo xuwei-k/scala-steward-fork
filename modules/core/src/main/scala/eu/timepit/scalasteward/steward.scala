@@ -125,7 +125,6 @@ object steward extends IOApp {
     Repo("foundweekends", "knockoff"),
     Repo("foundweekends", "conscript"),
     Repo("foundweekends", "pamflet"),
-    Repo("scalaz", "scalaz"),
     Repo("argonaut-io", "argonaut"),
     Repo("squeryl", "squeryl"),
     Repo("gitbucket", "gitbucket"),
@@ -151,7 +150,11 @@ object steward extends IOApp {
     Repo("scalapb", "ScalaPB")
   ).distinct.map(_.copy(createPullRequest = false))
 
-  val repositories = defaultRepos ::: anotherRepos
+  private[this] val lasts = List(
+    Repo("scalaz", "scalaz")
+  )
+
+  val repositories = (defaultRepos ::: anotherRepos).sortBy(_.show) ::: lasts
 
   def partial[A](x: Int, y: Int, values: List[A]): List[A] = {
     val n = values.size / y.toDouble
