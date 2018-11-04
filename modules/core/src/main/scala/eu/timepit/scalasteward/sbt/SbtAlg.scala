@@ -69,7 +69,7 @@ object SbtAlg {
         for {
           repoDir <- workspaceAlg.repoDir(repo)
           cmd = sbtCmd(libraryDependenciesAsJson, reloadPlugins, libraryDependenciesAsJson)
-          lines <- ignoreOptsFiles(repoDir)(processAlg.execSandboxed(cmd, repoDir))
+          lines <- ignoreOptsFiles(repoDir)(processAlg.exec(cmd, repoDir, s"[${repo.repo}]"))
         } yield lines.flatMap(parseDependencies).distinct
 
       override def getUpdates(project: ArtificialProject): F[List[Update]] =
@@ -88,7 +88,7 @@ object SbtAlg {
         for {
           repoDir <- workspaceAlg.repoDir(repo)
           cmd = sbtCmd(setCredentialsToNil, dependencyUpdates, reloadPlugins, dependencyUpdates)
-          lines <- ignoreOptsFiles(repoDir)(processAlg.execSandboxed(cmd, repoDir))
+          lines <- ignoreOptsFiles(repoDir)(processAlg.exec(cmd, repoDir, s"[${repo.repo}]"))
         } yield sbtLegacy.sanitizeUpdates(sbtLegacy.toUpdates(lines))
 
       val sbtDir: F[File] =
@@ -108,7 +108,7 @@ object SbtAlg {
         for {
           repoDir <- workspaceAlg.repoDir(repo)
           cmd = sbtCmd(repo.testCommands: _*)
-          _ <- ignoreOptsFiles(repoDir)(processAlg.execSandboxed(cmd, repoDir))
+          _ <- ignoreOptsFiles(repoDir)(processAlg.exec(cmd, repoDir, s"[${repo.repo}]"))
         } yield ()
     }
 }

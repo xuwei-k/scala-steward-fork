@@ -24,7 +24,7 @@ import scala.collection.mutable.ListBuffer
 import scala.sys.process.{Process, ProcessLogger}
 
 trait ProcessAlg[F[_]] {
-  def exec(command: Nel[String], cwd: File): F[List[String]]
+  def exec(command: Nel[String], cwd: File, logPrefix: String = ""): F[List[String]]
 
   def execSandboxed(command: Nel[String], cwd: File): F[List[String]]
 }
@@ -32,18 +32,18 @@ trait ProcessAlg[F[_]] {
 object ProcessAlg {
   def create[F[_]](secretValues: List[String])(implicit F: Sync[F]): ProcessAlg[F] =
     new ProcessAlg[F] {
-      override def exec(command: Nel[String], cwd: File): F[List[String]] =
+      override def exec(command: Nel[String], cwd: File, logPrefix: String = ""): F[List[String]] =
         F.delay {
           val escape: String => String = { value =>
             secretValues.foldLeft(value)(_.replaceAllLiterally(_, "[SECRET_VALUE]"))
           }
           val escapedCommand = command.toList.map(escape).mkString(" ")
-          println(escapedCommand)
+          println(logPrefix + escapedCommand)
           val lb = ListBuffer.empty[String]
           val log = new ProcessLogger {
             override def out(s: => String): Unit = {
               val ss = escape(s)
-              println(ss)
+              println(logPrefix + ss)
               lb.append(ss)
             }
             override def err(s: => String): Unit =
