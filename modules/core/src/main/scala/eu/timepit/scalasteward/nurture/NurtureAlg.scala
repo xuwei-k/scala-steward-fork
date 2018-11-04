@@ -65,10 +65,9 @@ class NurtureAlg[F[_]](
     } yield parent.default_branch
 
   private[this] def ignoreError[E](f: F[Unit])(implicit F: ApplicativeError[F, E]): F[Unit] =
-    f.recover {
+    f.recoverWith {
       case e =>
-        println(e)
-        ()
+        logger.info(e.toString)
     }
 
   def updateDependencies(repo: Repo, baseBranch: Branch)(implicit F: BracketThrowable[F]): F[Unit] =

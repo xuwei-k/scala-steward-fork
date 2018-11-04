@@ -30,10 +30,10 @@ object steward extends IOApp {
         val repos = getRepos(args)
 
         val (x, y) = repos.partition(_.createPullRequest)
-        println(("create pull req", x.map(_.show)))
-        println(("create branch", y.map(_.show)))
 
         for {
+          _ <- ctx.logger.info(s"create pull req ${x.map(_.show)}")
+          _ <- ctx.logger.info(s"create branch ${y.map(_.show)}")
           _ <- prepareEnv(ctx)
           //user <- ctx.config.gitHubUser[IO]
           //_ <- repos.traverse(ctx.dependencyService.forkAndCheckDependencies(user, _))
