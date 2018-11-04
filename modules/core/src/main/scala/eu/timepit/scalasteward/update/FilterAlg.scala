@@ -83,7 +83,11 @@ object FilterAlg {
         (repo.show, update.groupId, update.artifactId) match {
           case ("scala/scala-dist", "com.amazonaws", "aws-java-sdk-s3") => false
           case ("squeryl/squeryl", "org.apache.derby", "derby")         => false
-          case _                                                        => true
+
+          case ("foundweekends/conscript", "net.databinder.dispatch", _) => false
+          case ("foundweekends/conscript", "net.liftweb", _)             => false
+
+          case _ => true
         }
 
       def filterImpl(keep: Boolean, update: Update): F[Option[Update]] =
