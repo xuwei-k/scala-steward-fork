@@ -49,9 +49,8 @@ object FilterAlg {
       def globalKeep(update: Update): Boolean =
         (update.groupId, update.artifactId, update.nextVersion) match {
           // squeryl
-          case ("mysql", "mysql-connector-java", "8.0.13") => false
-          case ("org.postgresql", "postgresql", "42.1.4")  => false
-          case ("org.apache.derby", "derby", "10.14.2.0")  => false
+          case ("mysql", "mysql-connector-java", v) if v.startsWith("8.") => false
+          case ("org.postgresql", "postgresql", v) if v.startsWith("42.") => false
 
           case ("org.scala-sbt", "sbt-launch", _) => false
 
@@ -83,6 +82,7 @@ object FilterAlg {
       def localKeep(repo: Repo, update: Update): Boolean =
         (repo.show, update.groupId, update.artifactId) match {
           case ("scala/scala-dist", "com.amazonaws", "aws-java-sdk-s3") => false
+          case ("squeryl/squeryl", "org.apache.derby", "derby")         => false
           case _                                                        => true
         }
 
