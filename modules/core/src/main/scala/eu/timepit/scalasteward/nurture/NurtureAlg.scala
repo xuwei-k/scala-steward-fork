@@ -18,7 +18,7 @@ package eu.timepit.scalasteward.nurture
 
 import cats.effect.Sync
 import cats.implicits._
-import cats.{ApplicativeError, FlatMap}
+import cats.{ApplicativeError, FlatMap, MonadError}
 import cats.data.NonEmptyList
 import eu.timepit.scalasteward.application.Config
 import eu.timepit.scalasteward.git.{Branch, GitAlg}
@@ -143,14 +143,22 @@ class NurtureAlg[F[_]](
     for {
       _ <- logger.info(s"Process update ${data.update.show}")
       head = github.headFor(config.gitHubLogin, data.update)
-      pullRequests <- gitHubApiAlg.listPullRequests(data.repo, head)
-      _ <- pullRequests.headOption match {
-        case Some(pr) if pr.isClosed =>
-          logger.info(s"PR ${pr.html_url} is closed")
-        case Some(pr) =>
-          logger.info(s"Found PR ${pr.html_url}") >> updatePullRequest(data)
-        case None =>
-          applyNewUpdate(data)
+      branchName = git.branchFor(data.update)
+      exists <- remoteBranchExists(data)
+      _ <- if (exists) {
+        logger.info(s"Found the branch in remote. skip ${data.repo.show} ${data.update.show}")
+      } else {
+        for {
+          pullRequests <- gitHubApiAlg.listPullRequests(data.repo, head)
+          _ <- pullRequests.headOption match {
+            case Some(pr) if pr.isClosed =>
+              logger.info(s"PR ${pr.html_url} is closed")
+            case Some(pr) =>
+              logger.info(s"Found PR ${pr.html_url}") >> updatePullRequest(data)
+            case None =>
+              applyNewUpdate(data)
+          }
+        } yield ()
       }
     } yield ()
 
@@ -166,20 +174,29 @@ class NurtureAlg[F[_]](
         .ifM(
           gitAlg.returnToCurrentBranch(repo) {
             val branch = git.branchFor(data.map(_.update).filterNot(result): _*)
+            val repo = data.head.repo
             for {
-              _ <- logger.info(s"Create branch ${branch.name}")
-              _ <- gitAlg.createBranch(repo, branch)
-              message = "Update dependencies"
-              success <- commitAndPush(repo, message, branch)
-              _ <- if (success) {
-                createPullRequest(
-                  baseBranch = d.baseBranch,
-                  repo = repo,
-                  branch = branch,
-                  message = message
-                )
+              exists <- remoteBranchExists(repo, branch)
+              success <- if (exists) {
+                logger.info(s"Found the branch in remote. skip ${repo.show} ${branch}") >> F
+                  .point(false)
               } else {
-                F.unit
+                for {
+                  _ <- logger.info(s"Create branch ${branch.name}")
+                  _ <- gitAlg.createBranch(repo, branch)
+                  message = "Update dependencies"
+                  s <- commitAndPush(repo, message, branch)
+                  _ <- if (s) {
+                    createPullRequest(
+                      baseBranch = d.baseBranch,
+                      repo = repo,
+                      branch = branch,
+                      message = message
+                    )
+                  } else {
+                    F.unit
+                  }
+                } yield s
               }
             } yield success
           }, {
@@ -207,17 +224,43 @@ class NurtureAlg[F[_]](
       }
     } yield success
 
+  def remoteBranchExists[E](data: UpdateData)(implicit F: MonadError[F, E]): F[Boolean] = {
+    val branchName = git.branchFor(data.update)
+    remoteBranchExists(data.repo, branchName)
+  }
+
+  def remoteBranchExists[E](repo: Repo, branch: Branch)(
+      implicit F: MonadError[F, E]
+  ): F[Boolean] =
+    gitHubApiAlg
+      .getBranch(repo.copy(owner = config.gitHubLogin), branch)
+      .flatMap { res =>
+        logger.info(s"$res ${repo.show} $branch") >> F.point(true)
+      }
+      .recoverWith {
+        case e =>
+          logger.info(s"$e ${repo.show} $branch") >> F.point(false)
+      }
+
   def applyAndCheck(data: UpdateData)(implicit F: BracketThrowable[F]): F[Boolean] =
-    (editAlg.applyUpdate(data.repo, data.update) >> gitAlg.containsChanges(data.repo)).ifM(
-      gitAlg.returnToCurrentBranch(data.repo) {
-        for {
-          _ <- logger.info(s"Create branch ${data.updateBranch.name}")
-          _ <- gitAlg.createBranch(data.repo, data.updateBranch)
-          success <- commitAndCheck(data)
-        } yield success
-      },
-      logger.warn("No files were changed") >> F.point(false)
-    )
+    for {
+      exists <- remoteBranchExists(data)
+      s <- if (exists) {
+        logger.info(s"Found the branch in remote. skip ${data.repo.show} ${data.update.show}") >> F
+          .point(false)
+      } else {
+        (editAlg.applyUpdate(data.repo, data.update) >> gitAlg.containsChanges(data.repo)).ifM(
+          gitAlg.returnToCurrentBranch(data.repo) {
+            for {
+              _ <- logger.info(s"Create branch ${data.updateBranch.name}")
+              _ <- gitAlg.createBranch(data.repo, data.updateBranch)
+              success <- commitAndCheck(data)
+            } yield success
+          },
+          logger.warn("No files were changed") >> F.point(false)
+        )
+      }
+    } yield s
 
   def commitAndPush(repo: Repo, message: String, branch: Branch)(
       implicit F: MonadThrowable[F]
