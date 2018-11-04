@@ -42,7 +42,10 @@ object logger {
       }
 
     def infoTotalTime[A](label: String)(fa: F[A])(implicit F: Sync[F]): F[A] =
-      infoTimed(duration => s" --- $label Total time: ${dateTime.showDuration(duration)} ---")(fa)
+      infoTimed(
+        duration =>
+          s" ${"-" * 30} $label Total time: ${dateTime.showDuration(duration)} ${"-" * 30}"
+      )(fa)
   }
 
   def showUpdates[F[_]: Foldable: Functor](updates: F[Update]): String = {
