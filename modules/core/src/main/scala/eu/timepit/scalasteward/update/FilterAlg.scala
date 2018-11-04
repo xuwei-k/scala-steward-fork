@@ -43,7 +43,7 @@ object FilterAlg {
     new FilterAlg[F] {
       object ScalazVersions {
         def unapply(value: String): Boolean =
-          !(value.startsWith("7.3") || value.startsWith("8"))
+          (value.startsWith("7.3") || value.startsWith("8"))
       }
 
       def globalKeep(update: Update): Boolean =
@@ -56,6 +56,9 @@ object FilterAlg {
           case ("org.scala-sbt", "sbt-launch", _) => false
 
           case ("org.scalaz", _, ScalazVersions()) => false
+          
+          // argonaut
+          case ("com.google.caliper", "caliper", _) => false
 
           case ("com.geirsson", a, _) if a.startsWith("scalafmt-core") => false
 
