@@ -26,7 +26,7 @@ import scala.util.Random
 object steward extends IOApp {
   override def run(args: List[String]): IO[ExitCode] =
     Context.create[IO].use { ctx =>
-      ctx.logger.infoTotalTime {
+      ctx.logger.infoTotalTime("all") {
         val repos = getRepos(args)
 
         val (x, y) = repos.partition(_.createPullRequest)

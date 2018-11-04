@@ -43,7 +43,7 @@ class NurtureAlg[F[_]](
     user: AuthenticatedUser
 ) {
   def nurture(repo: Repo)(implicit F: Sync[F]): F[Unit] =
-    logger.infoTotalTime {
+    logger.infoTotalTime(repo.show) {
       logger.attemptLog_(s"Nurture ${repo.show}") {
         for {
           baseBranch <- cloneAndSync(repo)
