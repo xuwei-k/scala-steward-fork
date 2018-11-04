@@ -87,6 +87,9 @@ object FilterAlg {
           case ("foundweekends/conscript", "net.databinder.dispatch", _) => false
           case ("foundweekends/conscript", "net.liftweb", _)             => false
 
+          case ("foundweekends/giter8", "org.codehaus.plexus", "plexus-archiver") => false
+          case ("foundweekends/giter8", "org.scalacheck", "scalacheck")           => false
+
           case ("gitbucket/gitbucket", "com.wix", "wix-embedded-mysql") => false
 
           case _ => true
