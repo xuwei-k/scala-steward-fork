@@ -244,7 +244,6 @@ class NurtureAlg[F[_]](
       _ <- gitAlg.commitAll(data.repo, git.commitMsgFor(data.update))
       success <- sbtAlg.run(data.repo).map(_ => true).recoverWith {
         case e =>
-          e.printStackTrace()
           logger.error(e)(s"sbt ${data.repo.testCommands.mkString(" ")} fail") >> F.point(false)
       }
     } yield success
