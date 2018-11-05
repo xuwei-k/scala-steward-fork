@@ -150,12 +150,23 @@ object steward extends IOApp {
     Repo("scalikejdbc", "ddd-repository-example"),
     Repo("scalikejdbc", "scalikejdbc"),
     Repo("skinny-framework", "skinny-micro"),
+    Repo("skinny-framework", "skinny-framework"),
     Repo("scalate", "scalate"),
     Repo("scalatra", "scalamd"),
     Repo("scalatra", "sbt-scalatra"),
     Repo("scalatra", "scalatra.g8"),
     Repo("sbt", "sbt-protobuf"),
+    Repo("sbt", "sbt-appengine"),
+    Repo("sbt", "sbt-assembly"),
+    Repo("sbt", "sbt-buildinfo"),
+    Repo("eed3si9n", "expecty"),
+    Repo("eed3si9n", "gigahorse"),
+    Repo("eed3si9n", "sjson-new"),
     Repo("scalapb", "scalapb-json4s"),
+    Repo("scalapb", "scalapb-grpcweb"),
+    Repo("scalapb", "scalapb-template.g8"),
+    Repo("scalapb", "protobuf-scala-runtime"),
+    Repo("scalapb", "protoc-bridge"),
     Repo("scalapb", "ScalaPB")
   ).distinct.map(_.copy(createPullRequest = false))
 
