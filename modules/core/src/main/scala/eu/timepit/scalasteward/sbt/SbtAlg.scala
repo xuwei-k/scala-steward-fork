@@ -95,7 +95,7 @@ object SbtAlg {
         fileAlg.home.map(_ / ".sbt")
 
       def sbtCmd(command: String*): Nel[String] =
-        Nel.of("sbt", "-batch", "-no-colors", command.mkString(";", ";", ""))
+        Nel.of("sbt", "-batch", command.mkString(";", ";", ""))
 
       def ignoreOptsFiles[A](dir: File)(fa: F[A]): F[A] =
         fileAlg.removeTemporarily(dir / ".jvmopts") {
