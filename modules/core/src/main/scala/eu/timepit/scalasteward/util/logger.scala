@@ -44,7 +44,7 @@ object logger {
     def infoTotalTime[A](label: String)(fa: F[A])(implicit F: Sync[F]): F[A] =
       infoTimed(
         duration =>
-          s" ${"-" * 30} $label Total time: ${dateTime.showDuration(duration)} ${"-" * 30}"
+          s"${"-" * 30} Total time $label : ${dateTime.showDuration(duration)} ${"-" * 30}"
       )(fa)
   }
 
