@@ -159,6 +159,7 @@ object steward extends IOApp {
     Repo("sbt", "sbt-appengine"),
     Repo("sbt", "sbt-assembly"),
     Repo("sbt", "sbt-buildinfo"),
+    Repo("sbt", "sbt-ghpages"),
     Repo("eed3si9n", "expecty"),
     Repo("eed3si9n", "gigahorse"),
     Repo("eed3si9n", "sjson-new"),
