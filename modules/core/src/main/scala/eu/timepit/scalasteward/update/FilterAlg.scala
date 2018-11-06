@@ -55,7 +55,9 @@ object FilterAlg {
           case ("org.scala-sbt", "sbt-launch", _) => false
 
           case ("org.scalaz", _, ScalazVersions()) => false
-          
+
+          case ("javax.servlet", "javax.servlet-api", _) => false
+
           // argonaut
           case ("com.google.caliper", "caliper", _) => false
 
