@@ -91,6 +91,8 @@ object FilterAlg {
           case ("foundweekends/giter8", "org.scalacheck", "scalacheck")           => false
 
           case ("gitbucket/gitbucket", "com.wix", "wix-embedded-mysql") => false
+          
+          case ("xuwei-k/iarray", "org.scalaz", _) => false
 
           case _ => true
         }
