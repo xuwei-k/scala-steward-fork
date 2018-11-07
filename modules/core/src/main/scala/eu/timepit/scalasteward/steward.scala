@@ -107,6 +107,7 @@ object steward extends IOApp {
     Repo("scalaprops", "scalaprops-shapeless"),
     Repo("scalaprops", "sbt-scalaprops"),
     Repo("msgpack4z", "msgpack4z-core"),
+    Repo("msgpack4z", "msgpack4z-java"),
     Repo("msgpack4z", "msgpack4z-native"),
     Repo("msgpack4z", "msgpack4z-circe"),
     Repo("msgpack4z", "msgpack4z-argonaut"),
