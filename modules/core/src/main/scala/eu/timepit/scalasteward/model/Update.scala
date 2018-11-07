@@ -18,6 +18,7 @@ package eu.timepit.scalasteward.model
 
 import cats.data.NonEmptyList
 import cats.implicits._
+import cats.kernel.Eq
 import eu.timepit.refined.W
 import eu.timepit.scalasteward.model.Update.{Group, Single}
 import eu.timepit.scalasteward.util
@@ -37,6 +38,8 @@ sealed trait Update extends Product with Serializable {
 
   def nextVersion: String =
     newerVersions.head
+
+  def reverse: Update
 
   def replaceAllIn(target: String): Option[String] = {
     val quotedSearchTerms = searchTerms
@@ -83,6 +86,8 @@ object Update {
   ) extends Update {
     override def artifactIds: NonEmptyList[String] =
       NonEmptyList.one(artifactId)
+    override def reverse: Update =
+      copy(newerVersions = newerVersions.reverse)
   }
 
   final case class Group(
@@ -104,6 +109,8 @@ object Update {
 
     def artifactIdsPrefix: Option[MinLengthString[W.`3`.T]] =
       util.string.longestCommonPrefixGreater[W.`3`.T](artifactIds)
+    override def reverse: Update =
+      copy(newerVersions = newerVersions.reverse)
   }
 
   ///
@@ -148,4 +155,7 @@ object Update {
 
   implicit val updateDecoder: Decoder[Update] =
     io.circe.generic.semiauto.deriveDecoder
+
+  implicit val updateEq: Eq[Update] =
+    Eq.fromUniversalEquals[Update]
 }

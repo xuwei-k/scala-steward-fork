@@ -93,7 +93,7 @@ object FilterAlg {
           case ("foundweekends/giter8", "org.scalacheck", "scalacheck")           => false
 
           case ("gitbucket/gitbucket", "com.wix", "wix-embedded-mysql") => false
-          
+
           case ("xuwei-k/iarray", "org.scalaz", _) => false
 
           case ("eed3si9n/sjson-new", "pl.project13.scala", "sbt-jmh") => false

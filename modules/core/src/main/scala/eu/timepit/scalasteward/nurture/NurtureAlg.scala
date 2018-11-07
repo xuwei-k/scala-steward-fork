@@ -24,6 +24,7 @@ import eu.timepit.scalasteward.application.Config
 import eu.timepit.scalasteward.git.{Branch, GitAlg}
 import eu.timepit.scalasteward.github.GitHubApiAlg
 import eu.timepit.scalasteward.github.data.{AuthenticatedUser, NewPullRequestData, Repo}
+import eu.timepit.scalasteward.model.Update
 import eu.timepit.scalasteward.sbt.SbtAlg
 import eu.timepit.scalasteward.update.FilterAlg
 import eu.timepit.scalasteward.util.logger.LoggerOps
@@ -70,63 +71,79 @@ class NurtureAlg[F[_]](
         logger.info(e.toString)
     }
 
-  def updateDependencies(repo: Repo, baseBranch: Branch)(implicit F: BracketThrowable[F]): F[Unit] =
+  def updateDependencies(repo: Repo, baseBranch: Branch)(
+      implicit F: BracketThrowable[F]
+  ): F[Unit] = {
+    def run(updates: List[Update]): F[Unit] =
+      for {
+        _ <- logger.info(util.logger.showUpdates(updates))
+        filtered <- filterAlg.localFilterMany(repo, updates)
+        _ <- {
+          def deleteBranches(updates: List[UpdateData]): F[Unit] =
+            updates.traverse_ { u =>
+              ignoreError(gitAlg.deleteBranch(repo, u.updateBranch))
+            }
+
+          filtered match {
+            case Nil =>
+              F.unit
+            case List(update) =>
+              val data = UpdateData(repo, update, baseBranch, git.branchFor(update))
+              processUpdate(data)
+            case h :: t =>
+              for {
+                success <- processUpdates(
+                  NonEmptyList(h, t).map { update =>
+                    UpdateData(repo, update, baseBranch, git.branchFor(update))
+                  }
+                )
+                _ <- F.whenA(!success) {
+                  for {
+                    _ <- ignoreError(gitAlg.deleteBranch(repo, git.branchFor(filtered: _*)))
+                    dataList = filtered.map { update =>
+                      UpdateData(repo, update, baseBranch, git.branchFor(update))
+                    }
+                    _ <- {
+                      if (filtered.size == 2) {
+                        dataList.traverse_ { data =>
+                          ignoreError(processUpdate(data))
+                        }
+                      } else {
+                        for {
+                          successUpdates <- dataList.filterA(applyAndCheck)
+                          _ <- deleteBranches(successUpdates)
+                          _ <- successUpdates match {
+                            case Nil =>
+                              F.unit
+                            case x :: Nil =>
+                              processUpdate(x)
+                            case x :: xs =>
+                              processUpdates(NonEmptyList(x, xs))
+                          }
+                        } yield ()
+                      }
+                    }
+                  } yield ()
+                }
+              } yield ()
+          }
+        }
+      } yield ()
+
     for {
       _ <- logger.info(s"Check updates for ${repo.show}")
       updates <- sbtAlg.getUpdatesForRepo(repo)
-      _ <- logger.info(util.logger.showUpdates(updates))
-      filtered <- filterAlg.localFilterMany(repo, updates)
+      reversed = updates.map(_.reverse)
+      _ <- run(updates)
       _ <- {
-        def deleteBranches(updates: List[UpdateData]): F[Unit] =
-          updates.traverse_ { u =>
-            ignoreError(gitAlg.deleteBranch(repo, u.updateBranch))
-          }
-
-        filtered match {
-          case Nil =>
-            F.unit
-          case List(update) =>
-            val data = UpdateData(repo, update, baseBranch, git.branchFor(update))
-            processUpdate(data)
-          case h :: t =>
-            for {
-              success <- processUpdates(
-                NonEmptyList(h, t).map { update =>
-                  UpdateData(repo, update, baseBranch, git.branchFor(update))
-                }
-              )
-              _ <- F.whenA(!success) {
-                for {
-                  _ <- ignoreError(gitAlg.deleteBranch(repo, git.branchFor(filtered: _*)))
-                  dataList = filtered.map { update =>
-                    UpdateData(repo, update, baseBranch, git.branchFor(update))
-                  }
-                  _ <- {
-                    if (filtered.size == 2) {
-                      dataList.traverse_ { data =>
-                        ignoreError(processUpdate(data))
-                      }
-                    } else {
-                      for {
-                        successUpdates <- dataList.filterA(applyAndCheck)
-                        _ <- deleteBranches(successUpdates)
-                        _ <- successUpdates match {
-                          case Nil =>
-                            F.unit
-                          case x :: Nil =>
-                            processUpdate(x)
-                          case x :: xs =>
-                            processUpdates(NonEmptyList(x, xs))
-                        }
-                      } yield ()
-                    }
-                  }
-                } yield ()
-              }
-            } yield ()
+        if (reversed === updates) {
+          logger.info(s"skip reversed updates ${reversed.map(_.show)}")
+        } else {
+          logger.info(s"run reversed updates") >> run(reversed)
         }
       }
     } yield ()
+  }
 
   def processUpdates(data: NonEmptyList[UpdateData])(implicit F: BracketThrowable[F]): F[Boolean] =
     for {
