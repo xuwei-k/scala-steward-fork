@@ -38,6 +38,8 @@ trait FileAlg[F[_]] {
 
   def writeFileData(dir: File, fileData: FileData): F[Unit] =
     writeFile(dir / fileData.name, fileData.content)
+
+  def delete(dir: File): F[Unit]
 }
 
 object FileAlg {
@@ -76,5 +78,8 @@ object FileAlg {
 
       override def writeFile(file: File, content: String): F[Unit] =
         file.parentOption.fold(F.unit)(ensureExists(_).void) >> F.delay(file.write(content)).void
+
+      override def delete(file: File): F[Unit] =
+        F.delay(file.delete()).void
     }
 }

@@ -34,6 +34,8 @@ trait SbtAlg[F[_]] {
 
   def addGlobalPlugin(plugin: FileData): F[Unit]
 
+  def deleteGlobalPlugins: F[Unit]
+
   def addGlobalPlugins: F[Unit]
 
   def getDependencies(repo: Repo): F[List[Dependency]]
@@ -57,6 +59,18 @@ object SbtAlg {
         List("0.13", "1.0").traverse_ { series =>
           sbtDir.flatMap(dir => fileAlg.writeFileData(dir / series / "plugins", plugin))
         }
+
+      def deleteGlobalPlugin(plugin: FileData): F[Unit] =
+        List("0.13", "1.0").traverse_ { series =>
+          sbtDir.flatMap(dir => fileAlg.delete(dir / series / "plugins" / plugin.name))
+        }
+
+      override def deleteGlobalPlugins: F[Unit] =
+        for {
+          _ <- logger.info("delete global sbt plugins")
+          _ <- deleteGlobalPlugin(sbtUpdatesPlugin)
+          _ <- deleteGlobalPlugin(stewardPlugin)
+        } yield ()
 
       override def addGlobalPlugins: F[Unit] =
         for {

@@ -43,6 +43,7 @@ object steward extends IOApp {
             .traverse_(ctx.gitHubApiAlg.createFork)
           _ = Thread.sleep(5000)
           _ <- repos.traverse_(ctx.nurtureAlg.nurture)
+          _ <- ctx.sbtAlg.deleteGlobalPlugins
         } yield ExitCode.Success
       }
     }
