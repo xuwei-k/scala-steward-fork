@@ -24,6 +24,7 @@ import eu.timepit.scalasteward.application.Config
 import eu.timepit.scalasteward.git.{Branch, GitAlg}
 import eu.timepit.scalasteward.github.GitHubApiAlg
 import eu.timepit.scalasteward.github.data.{AuthenticatedUser, NewPullRequestData, Repo}
+import eu.timepit.scalasteward.model.UpdatesResult
 import eu.timepit.scalasteward.sbt.SbtAlg
 import eu.timepit.scalasteward.update.FilterAlg
 import eu.timepit.scalasteward.util.logger.LoggerOps
@@ -91,12 +92,12 @@ class NurtureAlg[F[_]](
             processUpdate(data)
           case h :: t =>
             for {
-              success <- processUpdates(
+              res1 <- processUpdates(
                 NonEmptyList(h, t).map { update =>
                   UpdateData(repo, update, baseBranch, git.branchFor(update))
                 }
               )
-              _ <- F.whenA(!success) {
+              _ <- F.whenA(res1.isFail) {
                 for {
                   _ <- ignoreError(gitAlg.deleteBranch(repo, git.branchFor(filtered: _*)))
                   dataList = filtered.map { update =>
@@ -129,15 +130,18 @@ class NurtureAlg[F[_]](
       }
     } yield ()
 
-  def processUpdates(data: NonEmptyList[UpdateData])(implicit F: BracketThrowable[F]): F[Boolean] =
+  def processUpdates(
+      data: NonEmptyList[UpdateData]
+  )(implicit F: BracketThrowable[F]): F[UpdatesResult] =
     for {
       _ <- logger.info(s"Process updates ${data.map(_.update.show)}")
       b = git.branchFor(data.toList.map(_.update): _*)
-      success <- (gitHubApiAlg.getBranch(data.head.repo, b) >> F.point(false)).recoverWith {
-        case e =>
-          logger.info(e.toString) >> applyNewUpdates(data)
-      }
-    } yield success
+      res <- (gitHubApiAlg.getBranch(data.head.repo, b) >> F.point(UpdatesResult.skip))
+        .recoverWith {
+          case e =>
+            logger.info(e.toString) >> applyNewUpdates(data)
+        }
+    } yield res
 
   def processUpdate(data: UpdateData)(implicit F: BracketThrowable[F]): F[Unit] =
     for {
@@ -164,7 +168,7 @@ class NurtureAlg[F[_]](
 
   def applyNewUpdates(
       data: NonEmptyList[UpdateData]
-  )(implicit F: BracketThrowable[F]): F[Boolean] = {
+  )(implicit F: BracketThrowable[F]): F[UpdatesResult] = {
     val d = data.head
     val repo = d.repo
     for {
@@ -177,9 +181,9 @@ class NurtureAlg[F[_]](
             val repo = data.head.repo
             for {
               exists <- remoteBranchExists(repo, branch)
-              success <- if (exists) {
+              res <- if (exists) {
                 logger.info(s"Found the branch in remote. skip ${repo.show} ${branch}") >> F
-                  .point(false)
+                  .point(UpdatesResult.skip)
               } else {
                 for {
                   _ <- logger.info(s"Create branch ${branch.name}")
@@ -196,11 +200,13 @@ class NurtureAlg[F[_]](
                   } else {
                     F.unit
                   }
-                } yield s
+                } yield {
+                  if (s) UpdatesResult.doUpdate else UpdatesResult.failure
+                }
               }
-            } yield success
+            } yield res
           }, {
-            logger.warn("No files were changed") >> F.point(true)
+            logger.warn("No files were changed") >> F.point(UpdatesResult.skip)
           }
         )
     } yield s
