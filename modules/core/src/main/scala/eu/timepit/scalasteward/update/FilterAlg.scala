@@ -104,6 +104,7 @@ object FilterAlg {
           case ("eed3si9n/sjson-new", "pl.project13.scala", "sbt-jmh") => false
 
           case ("atnos-org/eff", "org.portable-scala", _) => false
+          case ("atnos-org/eff", "org.tpolecat", _) => false // doobie
 
           case _ => true
         }
