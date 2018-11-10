@@ -43,7 +43,7 @@ object string {
       .fold(target)(suffix => target.substring(0, target.length - suffix.length))
 
   def lineLeftRight(s: String): String = {
-    val line = "─" * 12
+    val line = "-" * 20
     s"$line $s $line"
   }
 }
