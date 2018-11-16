@@ -69,6 +69,8 @@ object steward extends IOApp {
   }
 
   val defaultRepos = List(
+    Repo("xuwei-k", "scalaz-docs"),
+    Repo("xuwei-k", "scala-protobuf-docs"),
     Repo("xuwei-k", "scalikejdbc-flyway-sbt-example"),
     Repo("xuwei-k", "mima-web"),
     Repo("xuwei-k", "favorite_typo"),
