@@ -120,6 +120,8 @@ object steward extends IOApp {
   ).distinct.map(_.copy(createPullRequest = true))
 
   val anotherRepos = List(
+    Repo("sirthias", "parboiled2"),
+    Repo("sirthias", "parboiled"),
     Repo("foundweekends", "giter8", testCommands = List("^^ 0.13.17", "test:compile")),
     Repo("foundweekends", "knockoff"),
     Repo("foundweekends", "conscript"),
