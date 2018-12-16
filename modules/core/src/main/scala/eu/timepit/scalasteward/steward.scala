@@ -131,6 +131,7 @@ object steward extends IOApp {
     Repo("gitbucket", "gitbucket"),
     Repo("nscala-time", "nscala-time"),
     Repo("dwango", "S99"),
+    Repo("dwango", "scala_text"),
     Repo("dwango", "slack-webhook-appender"),
     Repo("unfiltered", "unfiltered"),
     Repo("unfiltered", "website"),
