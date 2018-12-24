@@ -97,6 +97,7 @@ object steward extends IOApp {
     Repo("xuwei-k", "nobox"),
     Repo("xuwei-k", "sbt-conflict-classes"),
     Repo("xuwei-k", "scalajspack"),
+    Repo("xuwei-k", "wartremover-scalikejdbc"),
     Repo("scalaprops", "scalaprops"),
     Repo("scalaprops", "scalaprops-native-example"),
     Repo("scalaprops", "scalaprops-examples"),
