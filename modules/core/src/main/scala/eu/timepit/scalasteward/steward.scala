@@ -91,7 +91,7 @@ object steward extends IOApp {
     Repo("xuwei-k", "mima"),
     Repo("xuwei-k", "sonatype"),
     Repo("xuwei-k", "optparse-applicative"),
-    Repo("xuwei-k", "sbt-jshell"),
+    // Repo("xuwei-k", "sbt-jshell"), TODO jdk 9+
     Repo("xuwei-k", "zeroapply"),
     Repo("xuwei-k", "sbt-class-diagram"),
     Repo("xuwei-k", "nobox"),
