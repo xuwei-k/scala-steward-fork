@@ -177,6 +177,7 @@ object steward extends IOApp {
     Repo("atnos-org", "eff"),
     Repo("atnos-org", "origami"),
     Repo("atnos-org", "producer"),
+    Repo("runarorama", "latr"),
     Repo("scalapb", "scalapb-json4s"),
     Repo("scalapb", "scalapb-grpcweb"),
     Repo("scalapb", "scalapb-template.g8"),
