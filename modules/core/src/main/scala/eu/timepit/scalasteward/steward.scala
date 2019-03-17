@@ -157,6 +157,7 @@ object steward extends IOApp {
     Repo("skinny-framework", "skinny-micro"),
     Repo("skinny-framework", "skinny-framework"),
     Repo("scalate", "scalate"),
+    Repo("scalatra", "scalatra"),
     Repo("scalatra", "scalamd"),
     Repo("scalatra", "sbt-scalatra"),
     Repo("scalatra", "scalatra.g8"),
