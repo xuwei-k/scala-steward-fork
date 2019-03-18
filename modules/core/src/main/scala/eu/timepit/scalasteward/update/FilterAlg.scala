@@ -113,6 +113,10 @@ object FilterAlg {
 
           case ("atnos-org/eff", "org.portable-scala", _) => false
           case ("atnos-org/eff", "org.tpolecat", _) => false // doobie
+          
+          case ("scalatra/scalatra", "org.apache.httpcomponents", _) => false
+          case ("scalatra/scalatra", "org.eclipse.jetty", _) => false
+          case ("scalatra/scalatra", "javax.servlet", _) => false
 
           case _ => true
         }
