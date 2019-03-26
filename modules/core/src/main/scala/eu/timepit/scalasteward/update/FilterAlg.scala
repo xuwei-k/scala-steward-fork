@@ -61,6 +61,8 @@ object FilterAlg {
           case ("org.scalaz", _, ScalazVersions()) => false
 
           case ("javax.servlet", "javax.servlet-api", _) => false
+          
+          case ("com.thesamet.scalapb", _, "0.9.0-RC1") => false // 0.9.0-M1 is newer
 
           // argonaut
           case ("com.google.caliper", "caliper", _) => false
