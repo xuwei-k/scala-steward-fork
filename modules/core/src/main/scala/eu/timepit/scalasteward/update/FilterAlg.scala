@@ -120,7 +120,9 @@ object FilterAlg {
           case ("scalatra/scalatra", "org.eclipse.jetty", _) => false
           case ("scalatra/scalatra", "javax.servlet", _) => false
           
-          case ("scalikejdbc/scalikejdbc", "org.apache.derby", _) => false    
+          case ("scalikejdbc/scalikejdbc", "org.apache.derby", _) => false
+          
+          case ("scalikejdbc/csvquery", "com.h2database", _) => false
 
           case _ => true
         }
