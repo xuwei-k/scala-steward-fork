@@ -62,6 +62,10 @@ object FilterAlg {
 
           case ("javax.servlet", "javax.servlet-api", _) => false
           
+          // https://github.com/scala/scala-parser-combinators/issues/197
+          // https://github.com/sbt/sbt/issues/4609
+          case ("org.scala-lang.modules", "scala-parser-combinators", "1.1.2") => false
+          
           case ("com.thesamet.scalapb", _, "0.9.0-RC1") => false // 0.9.0-M1 is newer
 
           // argonaut
