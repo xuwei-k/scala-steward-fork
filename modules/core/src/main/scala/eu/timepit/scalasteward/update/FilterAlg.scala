@@ -128,6 +128,8 @@ object FilterAlg {
           
           case ("scalikejdbc/csvquery", "com.h2database", _) => false
 
+          case ("skinny-framework/skinny-micro", "org.apache.httpcomponents", _) => false
+
           case _ => true
         }
 
