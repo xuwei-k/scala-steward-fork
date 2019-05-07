@@ -127,6 +127,8 @@ object FilterAlg {
           case ("scalikejdbc/scalikejdbc", "org.apache.derby", _) => false
           
           case ("scalikejdbc/csvquery", "com.h2database", _) => false
+          
+          case ("tototoshi/slick-joda-mapper", "com.h2database", _) => false
 
           case ("skinny-framework/skinny-micro", "org.apache.httpcomponents", _) => false
 
