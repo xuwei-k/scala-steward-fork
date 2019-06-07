@@ -55,8 +55,6 @@ object FilterAlg {
           case ("org.scala-sbt", "sbt-launch", _) => false
 
           case ("org.scalaz.stream", "scalaz-stream", "0.8.6") => false
-          
-          case ("org.mockito", "mockito-core", _ ) => false // TODO JDK11
 
           case ("org.scalaz", _, ScalazVersions()) => false
 
@@ -122,7 +120,8 @@ object FilterAlg {
           case ("scalatra/scalatra", "javax.servlet", _) => false
           
           case ("scalikejdbc/scalikejdbc", "org.apache.derby", _) => false
-          
+          case ("scalikejdbc/scalikejdbc", "org.mockito", _) => false // https://xuwei-k.hatenablog.com/entry/2019/06/04/120316
+
           case ("scalikejdbc/csvquery", "com.h2database", _) => false
           
           case ("tototoshi/slick-joda-mapper", "com.h2database", _) => false
