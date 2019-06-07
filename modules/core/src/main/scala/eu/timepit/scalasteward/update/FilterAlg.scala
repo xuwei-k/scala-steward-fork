@@ -59,11 +59,11 @@ object FilterAlg {
           case ("org.scalaz", _, ScalazVersions()) => false
 
           case ("javax.servlet", "javax.servlet-api", _) => false
-          
+
           // https://github.com/scala/scala-parser-combinators/issues/197
           // https://github.com/sbt/sbt/issues/4609
           case ("org.scala-lang.modules", "scala-parser-combinators", "1.1.2") => false
-          
+
           case ("com.thesamet.scalapb", _, "0.9.0-RC1") => false // 0.9.0-M1 is newer
 
           // argonaut
@@ -114,16 +114,16 @@ object FilterAlg {
 
           case ("atnos-org/eff", "org.portable-scala", _) => false
           case ("atnos-org/eff", "org.tpolecat", _) => false // doobie
-          
+
           case ("scalatra/scalatra", "org.apache.httpcomponents", _) => false
           case ("scalatra/scalatra", "org.eclipse.jetty", _) => false
           case ("scalatra/scalatra", "javax.servlet", _) => false
-          
+
           case ("scalikejdbc/scalikejdbc", "org.apache.derby", _) => false
           case ("scalikejdbc/scalikejdbc", "org.mockito", _) => false // https://xuwei-k.hatenablog.com/entry/2019/06/04/120316
 
           case ("scalikejdbc/csvquery", "com.h2database", _) => false
-          
+
           case ("tototoshi/slick-joda-mapper", "com.h2database", _) => false
 
           case ("skinny-framework/skinny-micro", "org.apache.httpcomponents", _) => false
