@@ -183,7 +183,12 @@ object GitAlg {
           _ <- exec(Nel.of("fetch", remote), repoDir)
           _ <- exec(Nel.of("checkout", "-B", branch, "--track", remoteBranch), repoDir)
           _ <- exec(Nel.of("merge", remoteBranch), repoDir)
-          _ <- push(repo, defaultBranch, force = true)
+          _ <- if (repo.createPullRequest) {
+            // skip push if my repositories(e.g. scalapb-json, scalaprops, msgpack4z)
+            F.point(())
+          } else {
+            push(repo, defaultBranch, force = true)
+          }
         } yield ()
 
       def exec(command: Nel[String], cwd: File): F[List[String]] =
