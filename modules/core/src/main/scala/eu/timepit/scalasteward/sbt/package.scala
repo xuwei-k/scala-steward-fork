@@ -26,13 +26,13 @@ package object sbt {
 
   def seriesToSpecificVersion(sbtSeries: SbtVersion): SbtVersion =
     sbtSeries.value match {
-      case "0.13" => SbtVersion("0.13.17")
+      case "0.13" => SbtVersion("0.13.18")
       case "1.0"  => defaultSbtVersion
       case _      => defaultSbtVersion
     }
 
   val sbtUpdatesPlugin: FileData =
-    FileData("sbt-updates.sbt", """addSbtPlugin("com.timushev.sbt" % "sbt-updates" % "0.3.4")""")
+    FileData("sbt-updates.sbt", """addSbtPlugin("com.timushev.sbt" % "sbt-updates" % "0.4.1")""")
 
   val stewardPlugin: FileData = {
     val name = "StewardPlugin.scala"
