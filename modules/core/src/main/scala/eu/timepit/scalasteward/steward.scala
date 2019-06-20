@@ -150,6 +150,7 @@ object steward extends IOApp {
     Repo("wartremover", "own-wart-example"),
     Repo("scopt", "scopt"),
     Repo("scalaj", "scalaj-http"),
+    Repo("flyway", "flyway-play"),
     Repo("scalikejdbc", "scalikejdbc"),
     Repo("scalikejdbc", "scalikejdbc-play-support"),
     Repo("scalikejdbc", "scalikejdbc-async"),
