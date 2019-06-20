@@ -51,6 +51,7 @@ object FilterAlg {
           // squeryl
           case ("mysql", "mysql-connector-java", v) if v.startsWith("8.") => false
           case ("org.postgresql", "postgresql", v) if v.startsWith("42.") => false
+          case ("org.postgresql", "postgresql", "9.4.1212") => false
 
           case ("org.scala-sbt", "sbt-launch", _) => false
 
