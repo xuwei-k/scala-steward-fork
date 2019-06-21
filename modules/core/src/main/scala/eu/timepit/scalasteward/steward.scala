@@ -186,11 +186,8 @@ object steward extends IOApp {
     Repo("atnos-org", "producer"),
     Repo("runarorama", "latr"),
     Repo("t2v", "holidays"),
-    Repo("scalapb", "scalapb-json4s"),
     Repo("scalapb", "scalapb-grpcweb"),
     Repo("scalapb", "scalapb-template.g8"),
-    Repo("scalapb", "protobuf-scala-runtime"),
-    Repo("scalapb", "protoc-bridge"),
   ).distinct.map(_.copy(createPullRequest = false))
 
   private[this] val lasts = List(
