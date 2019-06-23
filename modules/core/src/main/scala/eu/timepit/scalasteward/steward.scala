@@ -186,6 +186,11 @@ object steward extends IOApp {
     Repo("atnos-org", "producer"),
     Repo("runarorama", "latr"),
     Repo("t2v", "holidays"),
+    Repo("scalaz", "scalaz-deriving"),
+    Repo("scalaz", "scalaz-nio"),
+    Repo("scalaz", "testz"),
+    Repo("scalaz", "scalaz-parsers"),
+    Repo("scalaz", "scalaz-sbt"),
     Repo("scalapb", "scalapb-grpcweb"),
     Repo("scalapb", "scalapb-template.g8"),
   ).distinct.map(_.copy(createPullRequest = false))
