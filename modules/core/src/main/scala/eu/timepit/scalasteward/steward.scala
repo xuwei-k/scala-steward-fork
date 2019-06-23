@@ -186,6 +186,7 @@ object steward extends IOApp {
     Repo("atnos-org", "producer"),
     Repo("runarorama", "latr"),
     Repo("t2v", "holidays"),
+    Repo("etaty", "rediscala"),
     Repo("scalaz", "scalaz-deriving"),
     Repo("scalaz", "testz"),
     Repo("scalaz", "scalaz-parsers"),
