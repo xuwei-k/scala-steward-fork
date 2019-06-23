@@ -187,7 +187,6 @@ object steward extends IOApp {
     Repo("runarorama", "latr"),
     Repo("t2v", "holidays"),
     Repo("scalaz", "scalaz-deriving"),
-    Repo("scalaz", "scalaz-nio"),
     Repo("scalaz", "testz"),
     Repo("scalaz", "scalaz-parsers"),
     Repo("scalaz", "scalaz-sbt"),
