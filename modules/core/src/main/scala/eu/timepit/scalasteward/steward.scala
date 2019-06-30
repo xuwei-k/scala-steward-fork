@@ -189,7 +189,6 @@ object steward extends IOApp {
     Repo("etaty", "rediscala"),
     //    Repo("scalaz", "scalaz-deriving"), // TODO
     Repo("scalaz", "testz"),
-    Repo("scalaz", "scalaz-parsers"),
     Repo("scalaz", "scalaz-sbt"),
     Repo("scalapb", "scalapb-grpcweb"),
     Repo("scalapb", "scalapb-template.g8"),
