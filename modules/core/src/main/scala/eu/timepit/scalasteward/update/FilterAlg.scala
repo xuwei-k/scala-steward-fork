@@ -48,6 +48,8 @@ object FilterAlg {
 
       def globalKeep(update: Update): Boolean =
         (update.groupId, update.artifactId, update.nextVersion) match {
+          case (_, _, _) if update.currentVersion.endsWith(")") => false
+
           // squeryl
           case ("mysql", "mysql-connector-java", v) if v.startsWith("8.") => false
           case ("org.postgresql", "postgresql", v) if v.startsWith("42.") => false
