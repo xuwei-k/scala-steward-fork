@@ -37,7 +37,7 @@ object NewPullRequestData {
   implicit val newPullRequestDataEncoder: Encoder[NewPullRequestData] =
     deriveEncoder
 
-  def bodyFor(update: Update, login: String): String = {
+  def bodyFor(update: Update, login: String, binaryIssues: String): String = {
     val artifacts = update match {
       case s: Update.Single =>
         s" ${s.groupId}:${s.artifactId} "
@@ -56,6 +56,10 @@ object NewPullRequestData {
         |If you'd like to skip this version, you can just close this PR. If you have any feedback, just mention @$login in the comments below.
         |
         |Have a fantastic day writing Scala!
+        |
+        |```
+        |${binaryIssues}
+        |```
         |
         |<details>
         |<summary>Ignore future updates</summary>
@@ -95,10 +99,15 @@ object NewPullRequestData {
       change <- SemVer.getChange(curr, next)
     } yield s"semver-${change.render}"
 
-  def from(data: UpdateData, branchName: String, authorLogin: String): NewPullRequestData =
+  def from(
+      data: UpdateData,
+      branchName: String,
+      authorLogin: String,
+      binaryIssues: String
+  ): NewPullRequestData =
     NewPullRequestData(
       title = git.commitMsgFor(data.update),
-      body = bodyFor(data.update, authorLogin),
+      body = binaryIssues,
       head = branchName,
       base = data.baseBranch
     )

@@ -30,7 +30,11 @@ import org.scalasteward.core.util.Nel
 import org.scalasteward.core.vcs.data.Repo
 
 trait SbtAlg[F[_]] {
+  def run(repo: Repo): F[Unit]
+
   def addGlobalPlugin(plugin: FileData): F[Unit]
+
+  def deleteGlobalPlugins: F[Unit]
 
   def addGlobalPluginTemporarily[A](plugin: FileData)(fa: F[A]): F[A]
 
@@ -65,6 +69,17 @@ object SbtAlg {
         List("0.13", "1.0").traverse_ { series =>
           sbtDir.flatMap(dir => fileAlg.writeFileData(dir / series / "plugins", plugin))
         }
+
+      def deleteGlobalPlugin(plugin: FileData): F[Unit] =
+        List("0.13", "1.0").traverse_ { series =>
+          sbtDir.flatMap(dir => fileAlg.deleteForce(dir / series / "plugins" / plugin.name))
+        }
+
+      override def deleteGlobalPlugins: F[Unit] =
+        for {
+          _ <- logger.info("delete global sbt plugins")
+          _ <- deleteGlobalPlugin(stewardPlugin)
+        } yield ()
 
       override def addGlobalPluginTemporarily[A](plugin: FileData)(fa: F[A]): F[A] =
         sbtDir.flatMap { dir =>
@@ -105,7 +120,7 @@ object SbtAlg {
           _ <- fileAlg.writeFileData(projectDir, project.mkBuildProperties)
           _ <- fileAlg.writeFileData(projectDir, project.mkPluginsSbt)
           cmd = sbtCmd(project.dependencyUpdatesCmd)
-          lines <- processAlg.exec(cmd, updatesDir)
+          lines <- processAlg.exec(cmd, updatesDir, logPrefix = "")
           _ <- fileAlg.deleteForce(updatesDir)
           updatesWithCrossSuffix = parser.parseSingleUpdates(lines)
           allDeps = project.libraries ++ project.plugins
@@ -162,5 +177,12 @@ object SbtAlg {
           }
         }
       }
+
+      def run(repo: Repo): F[Unit] =
+        for {
+          repoDir <- workspaceAlg.repoDir(repo)
+          cmd = sbtCmd(repo.testCommands)
+          _ <- ignoreOptsFiles(repoDir)(processAlg.exec(cmd, repoDir, s"[${repo.repo}]"))
+        } yield ()
     }
 }
