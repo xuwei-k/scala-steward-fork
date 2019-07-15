@@ -25,6 +25,8 @@ import org.scalasteward.core.util
 import org.scalasteward.core.util.Nel
 import org.scalasteward.core.util.string.MinLengthString
 
+import scala.util.matching.Regex
+
 sealed trait Update extends Product with Serializable {
   def groupId: String
   def artifactId: String
@@ -53,6 +55,24 @@ sealed trait Update extends Product with Serializable {
     }
     val versions = (currentVersion :: newerVersions).mkString_("", " -> ", "")
     s"$groupId:$artifacts : $versions"
+  }
+
+  def replaceAllIn(target: String): Option[String] = {
+    val quotedSearchTerms = searchTerms
+      .map { term =>
+        Regex
+          .quoteReplacement(Update.removeCommonSuffix(term))
+          .replace("-", ".?")
+      }
+      .filter(_.nonEmpty)
+    val searchTerm = quotedSearchTerms.mkString_("(", "|", ")")
+    val regex = s"(?i)($searchTerm.*?)${Regex.quote(currentVersion)}".r
+    var updated = false
+    val result = regex.replaceAllIn(target, m => {
+      updated = true
+      m.group(1) + nextVersion
+    })
+    if (updated) Some(result) else None
   }
 }
 

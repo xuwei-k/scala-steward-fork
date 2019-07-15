@@ -16,6 +16,8 @@
 
 package org.scalasteward.core.io
 
+import java.io.IOException
+
 import better.files.File
 import cats.effect.{Concurrent, ContextShift, Timer}
 import cats.implicits._
@@ -23,10 +25,18 @@ import io.chrisdavenport.log4cats.Logger
 import org.scalasteward.core.application.Cli.EnvVar
 import org.scalasteward.core.application.Config
 import org.scalasteward.core.util.Nel
+
+import scala.collection.mutable.ListBuffer
 import scala.concurrent.duration._
+import scala.sys.process.{Process, ProcessLogger}
 
 trait ProcessAlg[F[_]] {
-  def exec(command: Nel[String], cwd: File, extraEnv: (String, String)*): F[List[String]]
+  def exec(
+      command: Nel[String],
+      cwd: File,
+      logPrefix: String,
+      extraEnv: (String, String)*
+  ): F[List[String]]
 
   def execSandboxed(command: Nel[String], cwd: File): F[List[String]]
 }
@@ -35,14 +45,20 @@ object ProcessAlg {
   abstract class UsingFirejail[F[_]](config: Config) extends ProcessAlg[F] {
     override def execSandboxed(command: Nel[String], cwd: File): F[List[String]] = {
       val envVars = config.envVars.map(EnvVar.unapply(_).get)
+      val logPrefix = ""
       if (config.disableSandbox) {
-        exec(command, cwd, envVars: _*)
+        exec(command, cwd, logPrefix = logPrefix, envVars: _*)
       } else {
         val whitelisted = (cwd.pathAsString :: config.whitelistedDirectories)
           .map(dir => s"--whitelist=$dir")
         val readOnly = config.readOnlyDirectories
           .map(dir => s"--read-only=$dir")
-        exec(Nel("firejail", whitelisted ++ readOnly) ::: command, cwd, envVars: _*)
+        exec(
+          Nel("firejail", whitelisted ++ readOnly) ::: command,
+          cwd,
+          logPrefix = logPrefix,
+          envVars: _*
+        )
       }
     }
   }
@@ -59,9 +75,20 @@ object ProcessAlg {
       override def exec(
           command: Nel[String],
           cwd: File,
+          logPrefix: String,
           extraEnv: (String, String)*
       ): F[List[String]] =
         logger.debug(s"Execute ${command.mkString_(" ")}") >>
-          process.slurp[F](command, Some(cwd.toJava), extraEnv.toMap, 10.minutes, logger.trace(_))
+          F.delay {
+            val lb = ListBuffer.empty[String]
+            val log = new ProcessLogger {
+              override def out(s: => String): Unit = lb.append(logPrefix + s)
+              override def err(s: => String): Unit = lb.append(logPrefix + s)
+              override def buffer[T](f: => T): T = f
+            }
+            val exitCode = Process(command.toList, cwd.toJava, extraEnv: _*).!(log)
+            if (exitCode =!= 0) throw new IOException(lb.mkString("\n"))
+            lb.result()
+          }
     }
 }

@@ -24,6 +24,7 @@ lazy val core = myCrossProject("core")
   .enablePlugins(BuildInfoPlugin, JavaAppPackaging, DockerPlugin)
   .settings(dockerSettings)
   .settings(
+    scalacOptions -= "-Xfatal-warnings",
     libraryDependencies ++= Seq(
       compilerPlugin(Dependencies.betterMonadicFor),
       compilerPlugin(Dependencies.kindProjector),
@@ -35,11 +36,13 @@ lazy val core = myCrossProject("core")
       Dependencies.circeParser,
       Dependencies.circeRefined,
       Dependencies.circeExtras,
+      Dependencies.coursier,
       Dependencies.commonsIo,
       Dependencies.fs2Core,
       Dependencies.http4sBlazeClient,
       Dependencies.http4sCirce,
       Dependencies.log4catsSlf4j,
+      Dependencies.mima,
       Dependencies.monocleCore,
       Dependencies.refined,
       Dependencies.refinedCats,

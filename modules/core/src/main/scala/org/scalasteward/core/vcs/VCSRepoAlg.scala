@@ -35,7 +35,7 @@ object VCSRepoAlg {
     new VCSRepoAlg[F] {
       override def clone(repo: Repo, repoOut: RepoOut): F[Unit] =
         for {
-          _ <- gitAlg.clone(repo, withLogin(repoOut.clone_url))
+          _ <- gitAlg.clone(repo, repoOut.cloneUrlSsh)
           _ <- gitAlg.setAuthor(repo, config.gitAuthor)
         } yield ()
 
@@ -44,7 +44,7 @@ object VCSRepoAlg {
         else {
           for {
             parent <- repoOut.parentOrRaise[F]
-            _ <- gitAlg.syncFork(repo, withLogin(parent.clone_url), parent.default_branch)
+            _ <- gitAlg.syncFork(repo, parent.cloneUrlSsh, parent.default_branch)
           } yield parent
         }
 

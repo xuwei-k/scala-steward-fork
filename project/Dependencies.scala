@@ -18,6 +18,7 @@ object Dependencies {
   val circeParser = "io.circe" %% "circe-parser" % Versions.circe
   val circeRefined = "io.circe" %% "circe-refined" % Versions.circe
   val circeExtras = "io.circe" %% "circe-generic-extras" % Versions.circe
+  val coursier = "io.get-coursier" %% "coursier" % "2.0.0-RC2-6"
   val commonsIo = "commons-io" % "commons-io" % "2.6"
   val fs2Core = "co.fs2" %% "fs2-core" % "1.0.5"
   val http4sBlazeClient = "org.http4s" %% "http4s-blaze-client" % Versions.http4s
@@ -26,6 +27,7 @@ object Dependencies {
   val kindProjector = "org.typelevel" %% "kind-projector" % "0.10.3"
   val log4catsSlf4j = "io.chrisdavenport" %% "log4cats-slf4j" % "0.3.0"
   val logbackClassic = "ch.qos.logback" % "logback-classic" % "1.2.3"
+  val mima = "com.typesafe" %% "mima-core" % "0.5.0"
   val monocleCore = "com.github.julien-truffaut" %% "monocle-core" % "1.5.1-cats"
   val refined = "eu.timepit" %% "refined" % Versions.refined
   val refinedCats = "eu.timepit" %% "refined-cats" % Versions.refined

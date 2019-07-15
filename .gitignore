@@ -4,6 +4,8 @@ lib_managed/
 src_managed/
 project/plugins/project/
 
+modules/core/.jvm/
+
 # IDEA specific
 .idea*/
 
