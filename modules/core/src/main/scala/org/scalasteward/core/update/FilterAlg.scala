@@ -80,7 +80,35 @@ object FilterAlg {
       case ("org.scala-lang", "scala-library")  => false
       case ("org.scala-lang", "scala-reflect")  => false
       case ("org.typelevel", "scala-library")   => false
-      case _                                    => true
+      case _ =>
+        (update.groupId, update.artifactId, update.currentVersion, update.newerVersions.head) match {
+          case (_, _, _, _) if update.currentVersion.endsWith(")") => false
+
+          case ("mysql", "mysql-connector-java", _, v) if v.startsWith("8.") => false
+          case ("org.postgresql", "postgresql", _, v) if v.startsWith("42.") => false
+          case ("org.postgresql", "postgresql", _, "9.4.1212")               => false
+          case ("org.scala-sbt", "sbt-launch", _, _)                         => false
+
+          case ("org.scalaz.stream", "scalaz-stream", _, "0.8.6") => false
+
+          case ("org.scalaz", _, _, ScalazVersions()) => false
+
+          case ("javax.servlet", "javax.servlet-api", _, _) => false
+
+          // https://github.com/scala/scala-parser-combinators/issues/197
+          // https://github.com/sbt/sbt/issues/4609
+          case ("org.scala-lang.modules", "scala-parser-combinators", _, "1.1.2") => false
+
+          // argonaut
+          case ("com.google.caliper", "caliper", _, _) => false
+
+          case ("com.geirsson", a, _, _) if a.startsWith("scalafmt-core") => false
+
+          // transitive dependencies of e.g. com.lucidchart:sbt-scalafmt
+          case ("com.geirsson", "scalafmt-cli_2.11", _, _)  => false
+          case ("com.geirsson", "scalafmt-core_2.12", _, _) => false
+          case _                                            => true
+        }
     }) && (update.configurations.fold("")(_.toLowerCase) match {
       case "phantom-js-jetty"    => false
       case "scalafmt"            => false
@@ -105,6 +133,11 @@ object FilterAlg {
       .removeAll(update.newerVersions, badVersions(update))
       .map(versions => update.copy(newerVersions = versions))
       .fold[FilterResult](Left(BadVersions(update)))(Right.apply)
+
+  object ScalazVersions {
+    def unapply(value: String): Boolean =
+      (value.startsWith("7.3") || value.startsWith("8"))
+  }
 
   private def badVersions(update: Update.Single): List[String] =
     (update.groupId, update.artifactId, update.currentVersion, update.nextVersion) match {

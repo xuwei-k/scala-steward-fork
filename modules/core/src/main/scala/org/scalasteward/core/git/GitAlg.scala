@@ -30,13 +30,15 @@ trait GitAlg[F[_]] {
 
   def checkoutBranch(repo: Repo, branch: Branch): F[Unit]
 
-  def clone(repo: Repo, url: Uri): F[Unit]
+  def clone(repo: Repo, url: String): F[Unit]
 
   def commitAll(repo: Repo, message: String): F[Unit]
 
   def containsChanges(repo: Repo): F[Boolean]
 
   def createBranch(repo: Repo, branch: Branch): F[Unit]
+
+  def deleteBranch(repo: Repo, branch: Branch): F[Unit]
 
   def currentBranch(repo: Repo): F[Branch]
 
@@ -47,7 +49,7 @@ trait GitAlg[F[_]] {
 
   def latestSha1(repo: Repo, branch: Branch): F[Sha1]
 
-  def push(repo: Repo, branch: Branch): F[Unit]
+  def push(repo: Repo, branch: Branch, force: Boolean): F[Unit]
 
   def remoteBranchExists(repo: Repo, branch: Branch): F[Boolean]
 
@@ -57,7 +59,7 @@ trait GitAlg[F[_]] {
 
   def setAuthor(repo: Repo, author: Author): F[Unit]
 
-  def syncFork(repo: Repo, upstreamUrl: Uri, defaultBranch: Branch): F[Unit]
+  def syncFork(repo: Repo, upstreamUrl: String, defaultBranch: Branch): F[Unit]
 
   final def returnToCurrentBranch[A, E](repo: Repo)(fa: F[A])(implicit F: Bracket[F, E]): F[A] =
     F.bracket(currentBranch(repo))(_ => fa)(checkoutBranch(repo, _))
@@ -86,7 +88,7 @@ object GitAlg {
           _ <- exec(Nel.of("checkout", branch.name), repoDir)
         } yield ()
 
-      override def clone(repo: Repo, url: Uri): F[Unit] =
+      override def clone(repo: Repo, url: String): F[Unit] =
         for {
           rootDir <- workspaceAlg.rootDir
           repoDir <- workspaceAlg.repoDir(repo)
@@ -98,6 +100,7 @@ object GitAlg {
           repoDir <- workspaceAlg.repoDir(repo)
           sign = if (config.signCommits) List("--gpg-sign") else List("--no-gpg-sign")
           _ <- exec(Nel.of("commit", "--all", "-m", message) ++ sign, repoDir)
+          _ <- exec(Nel.of("diff", "HEAD^"), repoDir)
         } yield ()
 
       override def containsChanges(repo: Repo): F[Boolean] =
@@ -109,6 +112,12 @@ object GitAlg {
         for {
           repoDir <- workspaceAlg.repoDir(repo)
           _ <- exec(Nel.of("checkout", "-b", branch.name), repoDir)
+        } yield ()
+
+      override def deleteBranch(repo: Repo, branch: Branch): F[Unit] =
+        for {
+          repoDir <- workspaceAlg.repoDir(repo)
+          _ <- exec(Nel.of("branch", "-D", branch.name), repoDir)
         } yield ()
 
       override def currentBranch(repo: Repo): F[Branch] =
@@ -139,10 +148,14 @@ object GitAlg {
           sha1 <- F.fromEither(Sha1.from(lines.mkString("").trim))
         } yield sha1
 
-      override def push(repo: Repo, branch: Branch): F[Unit] =
+      override def push(repo: Repo, branch: Branch, force: Boolean): F[Unit] =
         for {
           repoDir <- workspaceAlg.repoDir(repo)
-          _ <- exec(Nel.of("push", "--force", "--set-upstream", "origin", branch.name), repoDir)
+          f = if (force) List("--force") else Nil
+          _ <- exec(
+            Nel.of("push", f ::: List("--set-upstream", "origin", branch.name): _*),
+            repoDir
+          )
         } yield ()
 
       override def remoteBranchExists(repo: Repo, branch: Branch): F[Boolean] =
@@ -167,7 +180,7 @@ object GitAlg {
           _ <- exec(Nel.of("config", "user.name", author.name), repoDir)
         } yield ()
 
-      override def syncFork(repo: Repo, upstreamUrl: Uri, defaultBranch: Branch): F[Unit] =
+      override def syncFork(repo: Repo, upstreamUrl: String, defaultBranch: Branch): F[Unit] =
         for {
           repoDir <- workspaceAlg.repoDir(repo)
           remote = "upstream"
@@ -177,10 +190,19 @@ object GitAlg {
           _ <- exec(Nel.of("fetch", remote), repoDir)
           _ <- exec(Nel.of("checkout", "-B", branch, "--track", remoteBranch), repoDir)
           _ <- exec(Nel.of("merge", remoteBranch), repoDir)
-          _ <- push(repo, defaultBranch)
+          _ <- if (repo.createPullRequest) {
+            // skip push if my repositories(e.g. scalapb-json, scalaprops, msgpack4z)
+            F.point(())
+          } else {
+            push(repo, defaultBranch, force = true)
+          }
         } yield ()
 
       def exec(command: Nel[String], cwd: File): F[List[String]] =
-        processAlg.exec(gitCmd :: command, cwd, "GIT_ASKPASS" -> config.gitAskPass.pathAsString)
+        processAlg.exec(
+          gitCmd :: command,
+          cwd,
+          logPrefix = ""
+        )
     }
 }

@@ -28,7 +28,12 @@ import scala.collection.mutable.ListBuffer
 import scala.sys.process.{Process, ProcessLogger}
 
 trait ProcessAlg[F[_]] {
-  def exec(command: Nel[String], cwd: File, extraEnv: (String, String)*): F[List[String]]
+  def exec(
+      command: Nel[String],
+      cwd: File,
+      logPrefix: String,
+      extraEnv: (String, String)*
+  ): F[List[String]]
 
   def execSandboxed(command: Nel[String], cwd: File): F[List[String]]
 }
@@ -37,14 +42,20 @@ object ProcessAlg {
   abstract class UsingFirejail[F[_]](config: Config) extends ProcessAlg[F] {
     override def execSandboxed(command: Nel[String], cwd: File): F[List[String]] = {
       val envVars = config.envVars.map(EnvVar.unapply(_).get)
+      val logPrefix = ""
       if (config.disableSandbox) {
-        exec(command, cwd, envVars: _*)
+        exec(command, cwd, logPrefix = logPrefix, envVars: _*)
       } else {
         val whitelisted = (cwd.pathAsString :: config.whitelistedDirectories)
           .map(dir => s"--whitelist=$dir")
         val readOnly = config.readOnlyDirectories
           .map(dir => s"--read-only=$dir")
-        exec(Nel("firejail", whitelisted ++ readOnly) ::: command, cwd, envVars: _*)
+        exec(
+          Nel("firejail", whitelisted ++ readOnly) ::: command,
+          cwd,
+          logPrefix = logPrefix,
+          envVars: _*
+        )
       }
     }
   }
@@ -54,14 +65,15 @@ object ProcessAlg {
       override def exec(
           command: Nel[String],
           cwd: File,
+          logPrefix: String,
           extraEnv: (String, String)*
       ): F[List[String]] =
         logger.debug(s"Execute ${command.mkString_(" ")}") >>
           F.delay {
             val lb = ListBuffer.empty[String]
             val log = new ProcessLogger {
-              override def out(s: => String): Unit = lb.append(s)
-              override def err(s: => String): Unit = lb.append(s)
+              override def out(s: => String): Unit = lb.append(logPrefix + s)
+              override def err(s: => String): Unit = lb.append(logPrefix + s)
               override def buffer[T](f: => T): T = f
             }
             val exitCode = Process(command.toList, cwd.toJava, extraEnv: _*).!(log)

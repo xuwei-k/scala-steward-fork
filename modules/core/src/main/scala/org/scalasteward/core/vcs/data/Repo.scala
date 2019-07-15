@@ -17,10 +17,14 @@
 package org.scalasteward.core.vcs.data
 
 import io.circe.{KeyDecoder, KeyEncoder}
+import org.scalasteward.core.data.Update
 
 final case class Repo(
     owner: String,
-    repo: String
+    repo: String,
+    createPullRequest: Boolean = false,
+    testCommands: List[String] = "test:compile" :: Nil,
+    filter: Update.Single => Boolean = Function.const(true)
 ) {
   def show: String = s"$owner/$repo"
 }

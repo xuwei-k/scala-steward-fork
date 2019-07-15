@@ -24,6 +24,7 @@ lazy val core = myCrossProject("core")
   .enablePlugins(BuildInfoPlugin, JavaAppPackaging, DockerPlugin)
   .settings(dockerSettings)
   .settings(
+    scalacOptions -= "-Xfatal-warnings",
     libraryDependencies ++= Seq(
       compilerPlugin(Dependencies.betterMonadicFor),
       compilerPlugin(Dependencies.kindProjector),

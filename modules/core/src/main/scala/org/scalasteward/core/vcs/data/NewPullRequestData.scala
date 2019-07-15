@@ -97,7 +97,7 @@ object NewPullRequestData {
   def from(data: UpdateData, branchName: String, authorLogin: String): NewPullRequestData =
     NewPullRequestData(
       title = git.commitMsgFor(data.update),
-      body = bodyFor(data.update, authorLogin),
+      body = "",
       head = branchName,
       base = data.baseBranch
     )

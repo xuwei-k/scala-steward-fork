@@ -20,8 +20,13 @@ import org.scalasteward.core.data.Update
 import org.scalasteward.core.update.show
 
 package object git {
-  def branchFor(update: Update): Branch =
-    Branch(s"update/${update.name}-${update.nextVersion}")
+  def branchFor(updates: Update*): Branch =
+    Branch(
+      updates.toList
+        .sortBy(u => (u.name, u.nextVersion))
+        .map(u => s"${u.name}-${u.nextVersion}")
+        .mkString("update-", "-", "")
+    )
 
   def commitMsgFor(update: Update): String =
     s"Update ${show.oneLiner(update)} to ${update.nextVersion}"

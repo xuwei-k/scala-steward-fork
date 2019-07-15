@@ -46,7 +46,6 @@ import scala.sys.process.Process
   */
 final case class Config(
     workspace: File,
-    reposFile: File,
     gitAuthor: Author,
     vcsType: SupportedVCS,
     vcsApiHost: Uri,
@@ -62,14 +61,10 @@ final case class Config(
     envVars: List[EnvVar],
     pruneRepos: Boolean
 ) {
-  def vcsUser[F[_]](implicit F: Sync[F]): F[AuthenticatedUser] = {
-    val urlWithUser = util.uri.withUserInfo.set(vcsLogin)(vcsApiHost).renderString
-    val prompt = s"Password for '$urlWithUser': "
+  def vcsUser[F[_]](implicit F: Sync[F]): F[AuthenticatedUser] =
     F.delay {
-      val password = Process(List(gitAskPass.pathAsString, prompt)).!!.trim
-      AuthenticatedUser(vcsLogin, password)
+      AuthenticatedUser(vcsLogin, sys.env("GITHUB_TOKEN"))
     }
-  }
 }
 
 object Config {
@@ -77,7 +72,6 @@ object Config {
     F.delay {
       Config(
         workspace = args.workspace.toFile,
-        reposFile = args.reposFile.toFile,
         gitAuthor = Author(args.gitAuthorName, args.gitAuthorEmail),
         vcsType = args.vcsType,
         vcsApiHost = args.vcsApiHost,

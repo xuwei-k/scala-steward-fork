@@ -71,18 +71,24 @@ final class StewardAlg[F[_]](
       } yield filteredRepos
     }
 
-  def runF: F[ExitCode] =
+  def runF(args: List[String]): F[ExitCode] =
     logAlg.infoTotalTime("run") {
       for {
         _ <- prepareEnv
-        repos <- readRepos(config.reposFile)
+        repos = Repos.getRepos(args)
+        _ = repos.foreach(r => println(r.owner + "/" + r.repo))
         reposToNurture <- if (config.pruneRepos) pruneRepos(repos) else F.pure(repos)
+        _ <- repos
+          .filterNot(_.owner === config.vcsLogin)
+          .traverse_(nurtureAlg.vcsApiAlg.createFork)
+        _ = Thread.sleep(5000)
         _ <- reposToNurture.traverse_(nurtureAlg.nurture)
+        _ <- sbtAlg.deleteGlobalPlugins
       } yield ExitCode.Success
     }
 }
 
 object StewardAlg extends IOApp {
   override def run(args: List[String]): IO[ExitCode] =
-    Context.create[IO](args).use(_.runF)
+    Context.create[IO](args).use(_.runF(args))
 }

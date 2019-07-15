@@ -33,24 +33,25 @@ final class Cli[F[_]](implicit F: ApplicativeThrowable[F]) {
 
 object Cli {
   final case class Args(
-      workspace: String,
-      reposFile: String,
-      gitAuthorName: String,
-      gitAuthorEmail: String,
+      workspace: String = "scala-steward-workspace",
+      gitAuthorName: String = "xuwei-k",
+      gitAuthorEmail: String = "6b656e6a69@gmail.com",
       vcsType: SupportedVCS = SupportedVCS.GitHub,
       vcsApiHost: Uri = uri"https://api.github.com",
-      vcsLogin: String,
-      gitAskPass: String,
+      vcsLogin: String = "xuwei-k",
+      gitAskPass: String = "dummy git ask pass",
       signCommits: Boolean = false,
       whitelist: List[String] = Nil,
       readOnly: List[String] = Nil,
-      disableSandbox: Boolean = false,
+      disableSandbox: Boolean = true,
       doNotFork: Boolean = false,
       ignoreOptsFiles: Boolean = false,
       keepCredentials: Boolean = false,
       envVar: List[EnvVar] = Nil,
       pruneRepos: Boolean = false
-  )
+  ) {
+    def reposFile: String = ???
+  }
 
   final case class EnvVar(name: String, value: String)
 
