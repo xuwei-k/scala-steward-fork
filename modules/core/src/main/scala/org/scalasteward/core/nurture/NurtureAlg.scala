@@ -22,6 +22,7 @@ import org.scalasteward.core.application.Config
 import org.scalasteward.core.data.Update
 import org.scalasteward.core.edit.EditAlg
 import org.scalasteward.core.git.{Branch, GitAlg}
+import org.scalasteward.core.mima.MimaAlg
 import org.scalasteward.core.repoconfig.RepoConfigAlg
 import org.scalasteward.core.sbt.SbtAlg
 import org.scalasteward.core.update.FilterAlg
@@ -43,6 +44,7 @@ final class NurtureAlg[F[_]](
     logger: Logger[F],
     pullRequestRepo: PullRequestRepository[F],
     sbtAlg: SbtAlg[F],
+    mima: MimaAlg[F],
     F: BracketThrowable[F]
 ) {
   def nurture(repo: Repo): F[Unit] =
@@ -123,7 +125,13 @@ final class NurtureAlg[F[_]](
     for {
       _ <- logger.info(s"Create PR ${data.updateBranch.name}")
       branchName = vcs.createBranch(config.vcsType, data.fork, data.update)
-      requestData = NewPullRequestData.from(data, branchName, config.vcsLogin)
+      binaryIssues <- mima.backwordBinaryIssues(
+        groupId = data.update.groupId,
+        artifactId = data.update.artifactId,
+        current = data.update.currentVersion,
+        newer = data.update.newerVersions.head
+      )
+      requestData = NewPullRequestData.from(data, branchName, config.vcsLogin, binaryIssues)
       pr <- vcsApiAlg.createPullRequest(data.repo, requestData)
       _ <- pullRequestRepo.createOrUpdate(
         data.repo,
