@@ -23,6 +23,7 @@ import org.scalasteward.core.application.Config
 import org.scalasteward.core.data.Update
 import org.scalasteward.core.edit.EditAlg
 import org.scalasteward.core.git.{Branch, GitAlg}
+import org.scalasteward.core.mima.MimaAlg
 import org.scalasteward.core.repoconfig.RepoConfigAlg
 import org.scalasteward.core.data.Update
 import org.scalasteward.core.model.UpdatesResult
@@ -47,6 +48,7 @@ final class NurtureAlg[F[_]](
     logger: Logger[F],
     pullRequestRepo: PullRequestRepository[F],
     sbtAlg: SbtAlg[F],
+    mima: MimaAlg[F],
     F: BracketThrowable[F]
 ) {
   def nurture(repo: Repo): F[Unit] =
@@ -295,7 +297,13 @@ final class NurtureAlg[F[_]](
 
   def commitAndPush(data: UpdateData): F[Unit] =
     for {
-      _ <- gitAlg.commitAll(data.repo, git.commitMsgFor(data.update))
+      binaryIssues <- mima.backwordBinaryIssues(
+        groupId = data.update.groupId,
+        artifactId = data.update.artifactId,
+        current = data.update.currentVersion,
+        newer = data.update.newerVersions.head
+      )
+      _ <- gitAlg.commitAll(data.repo, git.commitMsgFor(data.update) + "\n\n" + binaryIssues)
       _ <- gitAlg.push(data.repo, data.updateBranch, force = false)
     } yield ()
 
@@ -320,7 +328,13 @@ final class NurtureAlg[F[_]](
     for {
       _ <- logger.info(s"Create PR ${data.updateBranch.name}")
       branchName = vcs.createBranch(config.vcsType, data.fork, data.update)
-      requestData = NewPullRequestData.from(data, branchName, config.vcsLogin)
+      binaryIssues <- mima.backwordBinaryIssues(
+        groupId = data.update.groupId,
+        artifactId = data.update.artifactId,
+        current = data.update.currentVersion,
+        newer = data.update.newerVersions.head
+      )
+      requestData = NewPullRequestData.from(data, branchName, config.vcsLogin, binaryIssues)
       pr <- vcsApiAlg.createPullRequest(data.repo, requestData)
       _ <- pullRequestRepo.createOrUpdate(
         data.repo,
@@ -393,7 +407,13 @@ final class NurtureAlg[F[_]](
 
   def commitAndCheck(data: UpdateData): F[Boolean] =
     for {
-      _ <- gitAlg.commitAll(data.repo, git.commitMsgFor(data.update))
+      binaryIssues <- mima.backwordBinaryIssues(
+        groupId = data.update.groupId,
+        artifactId = data.update.artifactId,
+        current = data.update.currentVersion,
+        newer = data.update.newerVersions.head
+      )
+      _ <- gitAlg.commitAll(data.repo, git.commitMsgFor(data.update) + "\n\n" + binaryIssues)
       success <- sbtAlg.run(data.repo).map(_ => true).recoverWith {
         case e =>
           logger.error(e)(s"sbt ${data.repo.testCommands.mkString(" ")} fail") >> F.point(false)
