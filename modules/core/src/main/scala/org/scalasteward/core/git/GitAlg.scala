@@ -113,13 +113,13 @@ object GitAlg {
           repoDir <- workspaceAlg.repoDir(repo)
           _ <- {
             val f = exec(Nel.of("checkout", "-b", branch.name), repoDir)
-            f.onError {
+            f.recoverWith {
               case e =>
                 println(e)
                 for {
                   _ <- deleteBranch(repo, branch)
-                  _ <- f
-                } yield ()
+                  x <- f
+                } yield x
             }
           }
         } yield ()
@@ -165,10 +165,10 @@ object GitAlg {
           _ <- exec(
             Nel.of("push", f ::: List("--set-upstream", "origin", branch.name): _*),
             repoDir
-          ).onError {
+          ).recoverWith {
             case e if !force =>
               println(s"skip push for ${repo} ${branch} ${e}")
-              F.point(())
+              F.point(Nil)
           }
         } yield ()
 
