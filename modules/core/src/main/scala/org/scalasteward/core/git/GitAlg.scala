@@ -111,7 +111,16 @@ object GitAlg {
       override def createBranch(repo: Repo, branch: Branch): F[Unit] =
         for {
           repoDir <- workspaceAlg.repoDir(repo)
-          _ <- exec(Nel.of("checkout", "-b", branch.name), repoDir)
+          _ <- {
+            val f = exec(Nel.of("checkout", "-b", branch.name), repoDir)
+            f.onError{ case e =>
+              println(e)
+              for {
+                _ <- deleteBranch(repo, branch)
+                _ <- f
+              } yield ()
+            }
+          }
         } yield ()
 
       override def deleteBranch(repo: Repo, branch: Branch): F[Unit] =

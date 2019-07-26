@@ -59,6 +59,7 @@ object MimaAlg {
             )
             .withRepositories(
               Seq(
+                Repositories.central,
                 Repositories.sbtPlugin("releases")
               )
             )
