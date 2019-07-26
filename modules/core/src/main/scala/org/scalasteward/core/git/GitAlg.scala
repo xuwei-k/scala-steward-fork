@@ -113,12 +113,13 @@ object GitAlg {
           repoDir <- workspaceAlg.repoDir(repo)
           _ <- {
             val f = exec(Nel.of("checkout", "-b", branch.name), repoDir)
-            f.onError{ case e =>
-              println(e)
-              for {
-                _ <- deleteBranch(repo, branch)
-                _ <- f
-              } yield ()
+            f.onError {
+              case e =>
+                println(e)
+                for {
+                  _ <- deleteBranch(repo, branch)
+                  _ <- f
+                } yield ()
             }
           }
         } yield ()
@@ -164,7 +165,11 @@ object GitAlg {
           _ <- exec(
             Nel.of("push", f ::: List("--set-upstream", "origin", branch.name): _*),
             repoDir
-          )
+          ).onError {
+            case e if !force =>
+              println(s"skip push for ${repo} ${branch} ${e}")
+              F.point(())
+          }
         } yield ()
 
       override def remoteBranchExists(repo: Repo, branch: Branch): F[Boolean] =
