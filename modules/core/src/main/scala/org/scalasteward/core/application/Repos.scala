@@ -80,7 +80,7 @@ object Repos {
   val anotherRepos = List(
     Repo("sirthias", "parboiled2"),
     Repo("sirthias", "parboiled"),
-    Repo("foundweekends", "giter8", testCommands = List("^^ 0.13.17", "test:compile")),
+    Repo("foundweekends", "giter8"),
     Repo("foundweekends", "knockoff"),
     Repo("foundweekends", "conscript"),
     Repo("foundweekends", "pamflet"),
