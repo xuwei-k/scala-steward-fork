@@ -119,7 +119,7 @@ object Repos {
       u.groupId =!= "com.h2database"
     }),
     //   Repo("skinny-framework", "skinny-micro"),
-    //   Repo("skinny-framework", "skinny-framework"),
+    Repo("skinny-framework", "skinny-framework"),
     Repo("scalate", "scalate"),
     Repo("scalatra", "scalatra"),
     Repo("scalatra", "scalamd"),
