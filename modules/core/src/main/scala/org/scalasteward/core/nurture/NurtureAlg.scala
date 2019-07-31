@@ -297,7 +297,7 @@ final class NurtureAlg[F[_]](
 
   def commitAndPush(data: UpdateData): F[Unit] =
     for {
-      binaryIssues <- mima.backwordBinaryIssues(
+      binaryIssues <- mima.backwardBinaryIssues(
         groupId = data.update.groupId,
         artifactId = data.update.artifactId,
         current = data.update.currentVersion,
@@ -328,7 +328,7 @@ final class NurtureAlg[F[_]](
     for {
       _ <- logger.info(s"Create PR ${data.updateBranch.name}")
       branchName = vcs.createBranch(config.vcsType, data.fork, data.update)
-      binaryIssues <- mima.backwordBinaryIssues(
+      binaryIssues <- mima.backwardBinaryIssues(
         groupId = data.update.groupId,
         artifactId = data.update.artifactId,
         current = data.update.currentVersion,
@@ -407,7 +407,7 @@ final class NurtureAlg[F[_]](
 
   def commitAndCheck(data: UpdateData): F[Boolean] =
     for {
-      binaryIssues <- mima.backwordBinaryIssues(
+      binaryIssues <- mima.backwardBinaryIssues(
         groupId = data.update.groupId,
         artifactId = data.update.artifactId,
         current = data.update.currentVersion,

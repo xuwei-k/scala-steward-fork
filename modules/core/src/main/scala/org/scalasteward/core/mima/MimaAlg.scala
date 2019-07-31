@@ -30,7 +30,7 @@ import com.typesafe.tools.mima.core.util.log.Logging
 import scala.util.control.NonFatal
 
 trait MimaAlg[F[_]] {
-  def backwordBinaryIssues(
+  def backwardBinaryIssues(
       groupId: String,
       artifactId: String,
       current: String,
@@ -44,7 +44,7 @@ object MimaAlg {
       log: Logger[F]
   ): MimaAlg[F] =
     new MimaAlg[F] {
-      override def backwordBinaryIssues(
+      override def backwardBinaryIssues(
           groupId: String,
           artifactId: String,
           current: String,
