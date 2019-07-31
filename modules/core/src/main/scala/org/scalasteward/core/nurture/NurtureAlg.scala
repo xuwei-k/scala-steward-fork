@@ -236,13 +236,23 @@ final class NurtureAlg[F[_]](
                 for {
                   _ <- logger.info(s"Create branch ${branch.name}")
                   _ <- gitAlg.createBranch(repo, branch)
+                  binaryIssues <- filtered
+                    .traverse { update =>
+                      mima.backwardBinaryIssues(
+                        groupId = update.groupId,
+                        artifactId = update.artifactId,
+                        current = update.currentVersion,
+                        newer = update.newerVersions.head
+                      )
+                    }
+                    .map(_.mkString("\n\n"))
                   message = filtered match {
                     case List(x) =>
                       git.commitMsgFor(x)
                     case _ =>
                       "Update dependencies"
                   }
-                  s <- commitAndPush(repo, message, branch)
+                  s <- commitAndPush(repo, message + "\n\n" + binaryIssues, branch)
                   _ <- if (s) {
                     createPullRequest(
                       baseBranch = d.baseBranch,
