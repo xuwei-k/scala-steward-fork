@@ -27,6 +27,7 @@ import com.typesafe.tools.mima.core
 import com.typesafe.tools.mima.lib
 import com.typesafe.tools.mima.core.util.log.Logging
 
+import scala.collection.concurrent.TrieMap
 import scala.util.control.NonFatal
 
 trait MimaAlg[F[_]] {
@@ -39,6 +40,11 @@ trait MimaAlg[F[_]] {
 }
 
 object MimaAlg {
+
+  private case class Arg(groupId: String, artifactId: String, current: String, newer: String)
+
+  private[this] val cache: TrieMap[Arg, String] = TrieMap.empty[Arg, String]
+
   def create[F[_]](
       implicit F: Monad[F],
       log: Logger[F]
@@ -50,6 +56,31 @@ object MimaAlg {
           current: String,
           newer: String
       ): F[String] = {
+        val arg = Arg(
+          groupId = groupId,
+          artifactId = artifactId,
+          current = current,
+          newer = newer
+        )
+        F.point(
+          cache.getOrElseUpdate(
+            arg,
+            backwardBinaryIssues0(
+              groupId = groupId,
+              artifactId = artifactId,
+              current = current,
+              newer = newer
+            )
+          )
+        )
+      }
+
+      private[this] def backwardBinaryIssues0(
+          groupId: String,
+          artifactId: String,
+          current: String,
+          newer: String
+      ): String = {
 
         def fetch0(v: String, artifactId0: String): File =
           Fetch[coursier.util.Task]()
@@ -116,11 +147,11 @@ object MimaAlg {
             e
           }
 
-          F.point(result)
+          result
         } catch {
           case e: Throwable =>
             e.printStackTrace()
-            F.point("")
+            ""
         }
       }
     }
