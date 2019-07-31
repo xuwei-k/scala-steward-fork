@@ -27,6 +27,8 @@ import com.typesafe.tools.mima.core
 import com.typesafe.tools.mima.lib
 import com.typesafe.tools.mima.core.util.log.Logging
 
+import scala.util.control.NonFatal
+
 trait MimaAlg[F[_]] {
   def backwordBinaryIssues(
       groupId: String,
@@ -49,11 +51,11 @@ object MimaAlg {
           newer: String
       ): F[String] = {
 
-        def fetch(v: String): File =
+        def fetch0(v: String, artifactId0: String): File =
           Fetch[coursier.util.Task]()
             .addDependencies(
               Dependency.of(
-                Module(Organization(groupId), ModuleName(artifactId)),
+                Module(Organization(groupId), ModuleName(artifactId0)),
                 v
               )
             )
@@ -64,10 +66,31 @@ object MimaAlg {
               )
             )
             .run()
-            .filter(_.getName === s"${artifactId}-${v}.jar") match {
+            .filter(_.getName === s"${artifactId0}-${v}.jar") match {
             case Seq()    => sys.error("could not found jar")
             case Seq(jar) => jar
             case xs       => sys.error(s"found multiple jars!? ${xs}")
+          }
+
+        def fetch(v: String): File =
+          try {
+            fetch0(v, artifactId)
+          } catch {
+            case NonFatal(e0) =>
+              println(e0)
+              try {
+                fetch0(v, artifactId + "_2.12")
+              } catch {
+                case NonFatal(e1) =>
+                  println(e1)
+                  try {
+                    fetch0(v, artifactId + "_2.12_1.0")
+                  } catch {
+                    case NonFatal(e2) =>
+                      println(e2)
+                      throw e0
+                  }
+              }
           }
 
         try {
