@@ -99,8 +99,17 @@ object GitAlg {
       override def commitAll(repo: Repo, message: String): F[Unit] =
         for {
           repoDir <- workspaceAlg.repoDir(repo)
+          trimMessage = {
+            val max = 2048
+            if (message.length > max) {
+              println(s"too long commit message! ${message.length}")
+              message.linesIterator.next
+            } else {
+              message
+            }
+          }
           sign = if (config.signCommits) List("--gpg-sign") else List("--no-gpg-sign")
-          _ <- exec(Nel.of("commit", "--all", "-m", message) ++ sign, repoDir)
+          _ <- exec(Nel.of("commit", "--all", "-m", trimMessage) ++ sign, repoDir)
           _ <- exec(Nel.of("diff", "HEAD^"), repoDir)
         } yield ()
 
