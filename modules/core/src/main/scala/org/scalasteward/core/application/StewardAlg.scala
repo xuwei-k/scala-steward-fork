@@ -82,9 +82,15 @@ final class StewardAlg[F[_]](
           .filterNot(_.owner === config.vcsLogin)
           .traverse_(nurtureAlg.vcsApiAlg.createFork)
         _ = Thread.sleep(5000)
-        result <- reposToNurture.traverse(nurtureAlg.nurture)
+        result <- reposToNurture.traverse(repo => nurtureAlg.nurture(repo).map(repo -> _))
         _ <- sbtAlg.deleteGlobalPlugins
-      } yield if (result.forall(_.isRight)) ExitCode.Success else ExitCode.Error
+        _ = {
+          result.collect {
+            case (r, Left(e)) =>
+              println(Console.RED + s"failed ${r} ${e}" + Console.RESET)
+          }
+        }
+      } yield if (result.forall(_._2.isRight)) ExitCode.Success else ExitCode.Error
     }
 
 }
