@@ -20,13 +20,29 @@ import org.scalasteward.core.data.Update
 import org.scalasteward.core.update.show
 
 package object git {
-  def branchFor(updates: Update*): Branch =
+  def branchFor(updates: Update*): Branch = {
+    val original = updates.toList
+      .sortBy(u => (u.name, u.nextVersion))
+      .map(u => s"${u.name}-${u.nextVersion}")
+      .mkString("update-", "-", "")
+    val maxLength = 127
     Branch(
-      updates.toList
-        .sortBy(u => (u.name, u.nextVersion))
-        .map(u => s"${u.name}-${u.nextVersion}")
-        .mkString("update-", "-", "")
+      if (original.length > maxLength) {
+        val sha1Name = "update-" + sha1(original)
+        println(s"branch name too long. use sha1 ${sha1Name} ${original}")
+        sha1Name
+      } else {
+        original
+      }
     )
+  }
+
+  private[this] def sha1(str: String): String = {
+    val crypt = java.security.MessageDigest.getInstance("SHA-1")
+    crypt.reset()
+    crypt.update(str.getBytes("UTF-8"))
+    new java.math.BigInteger(1, crypt.digest).toString(16)
+  }
 
   def commitMsgFor(update: Update): String =
     s"Update ${show.oneLiner(update)} to ${update.nextVersion}"
