@@ -88,7 +88,7 @@ object Repos {
     Repo("squeryl", "squeryl", filter = u => {
       u.groupId =!= "org.apache.derby"
     }),
-    Repo("gitbucket", "gitbucket"),
+    // Repo("gitbucket", "gitbucket"), // too many updates. TODO re-enable
     Repo("nscala-time", "nscala-time"),
     Repo("dwango", "S99"),
     Repo("dwango", "scala_text"),
