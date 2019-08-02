@@ -31,14 +31,20 @@ final class HttpJsonClient[F[_]: Sync](
 ) {
   type ModReq = Request[F] => F[Request[F]]
 
-  def get[A: Decoder](uri: Uri, modify: ModReq): F[A] =
+  def get[A: Decoder](uri: Uri, modify: ModReq): F[A] = {
+    println(s"get $uri")
     request[A](GET, uri, modify)
+  }
 
-  def post[A: Decoder](uri: Uri, modify: ModReq): F[A] =
+  def post[A: Decoder](uri: Uri, modify: ModReq): F[A] = {
+    println(s"post $uri")
     request[A](POST, uri, modify)
+  }
 
-  def postWithBody[A: Decoder, B: Encoder](uri: Uri, body: B, modify: ModReq): F[A] =
+  def postWithBody[A: Decoder, B: Encoder](uri: Uri, body: B, modify: ModReq): F[A] = {
+    println(s"post $uri $body")
     post[A](uri, modify.compose(_.withEntity(body)(jsonEncoderOf[F, B])))
+  }
 
   private def request[A: Decoder](method: Method, uri: Uri, modify: ModReq): F[A] =
     client.expectOr[A](modify(Request[F](method, uri)))(
