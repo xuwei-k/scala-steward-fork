@@ -266,6 +266,7 @@ final class NurtureAlg[F[_]](
                     createPullRequest(
                       baseBranch = d.baseBranch,
                       repo = repo,
+                      fork = data.head.fork,
                       branch = branch,
                       message = message
                     )
@@ -294,6 +295,7 @@ final class NurtureAlg[F[_]](
             _ <- createPullRequest(
               baseBranch = data.baseBranch,
               repo = data.repo,
+              fork = data.fork,
               branch = data.updateBranch,
               message = git.commitMsgFor(data.update)
             )
@@ -327,14 +329,20 @@ final class NurtureAlg[F[_]](
       _ <- gitAlg.push(data.repo, data.updateBranch, force = false)
     } yield ()
 
-  def createPullRequest(baseBranch: Branch, repo: Repo, branch: Branch, message: String): F[Unit] =
+  def createPullRequest(
+      baseBranch: Branch,
+      repo: Repo,
+      fork: Repo,
+      branch: Branch,
+      message: String
+  ): F[Unit] =
     if (repo.createPullRequest) {
       for {
         _ <- logger.info(s"Create PR ${branch.name}")
         requestData = NewPullRequestData(
           title = message,
           body = "",
-          head = branch.name,
+          head = s"${fork.owner}:${branch.name}",
           base = baseBranch
         )
         pullRequest <- vcsApiAlg.createPullRequest(repo, requestData)
