@@ -121,7 +121,9 @@ object Repos {
     //   Repo("skinny-framework", "skinny-micro"),
     Repo("skinny-framework", "skinny-framework"),
     Repo("scalate", "scalate"),
-    Repo("scalatra", "scalatra"),
+    Repo("scalatra", "scalatra", filter = u => {
+      u.groupId =!= "org.apache.httpcomponents" // tests fail
+    }),
     Repo("scalatra", "scalamd"),
     Repo("scalatra", "sbt-scalatra"),
     Repo("scalatra", "scalatra.g8"),
