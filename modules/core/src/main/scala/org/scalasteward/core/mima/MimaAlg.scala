@@ -82,11 +82,11 @@ object MimaAlg {
           newer: String
       ): String = {
 
-        def fetch0(v: String, artifactId0: String): File =
+        def fetch0(v: String, artifactId0: String, attributes: Map[String, String]): File =
           Fetch[coursier.util.Task]()
             .addDependencies(
               Dependency.of(
-                Module(Organization(groupId), ModuleName(artifactId0)),
+                Module(Organization(groupId), ModuleName(artifactId0), attributes),
                 v
               )
             )
@@ -105,21 +105,27 @@ object MimaAlg {
 
         def fetch(v: String): File =
           try {
-            fetch0(v, artifactId)
+            fetch0(v, artifactId, Map.empty)
           } catch {
             case NonFatal(e0) =>
               println(e0)
               try {
-                fetch0(v, artifactId + "_2.12")
+                fetch0(v, artifactId + "_2.12", Map.empty)
               } catch {
                 case NonFatal(e1) =>
                   println(e1)
                   try {
-                    fetch0(v, artifactId + "_2.12_1.0")
+                    fetch0(v, artifactId, Map("scalaVersion" -> "2.12", "sbtVersion" -> "1.0"))
                   } catch {
                     case NonFatal(e2) =>
                       println(e2)
-                      throw e0
+                      try {
+                        fetch0(v, artifactId, Map("scalaVersion" -> "2.10", "sbtVersion" -> "0.13"))
+                      } catch {
+                        case NonFatal(e3) =>
+                          println(e3)
+                          throw e0
+                      }
                   }
               }
           }
