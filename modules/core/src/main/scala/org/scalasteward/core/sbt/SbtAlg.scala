@@ -153,7 +153,7 @@ object SbtAlg {
         fileAlg.home.map(_ / ".sbt")
 
       def exec(command: Nel[String], repoDir: File): F[List[String]] =
-        maybeIgnoreOptsFiles(repoDir)(processAlg.execSandboxed(command, repoDir))
+        maybeIgnoreOptsFiles(repoDir)(processAlg.exec(command, repoDir, "[" + repoDir.name + "]"))
 
       def sbtCmd(commands: List[String]): Nel[String] =
         Nel.of("sbt", "-batch", "-no-colors", commands.mkString(";", ";", ""))

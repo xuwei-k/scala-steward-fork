@@ -82,8 +82,14 @@ object ProcessAlg {
           F.delay {
             val lb = ListBuffer.empty[String]
             val log = new ProcessLogger {
-              override def out(s: => String): Unit = lb.append(logPrefix + s)
-              override def err(s: => String): Unit = lb.append(logPrefix + s)
+              override def out(s: => String): Unit = {
+                println(logPrefix + s)
+                lb.append(s)
+              }
+              override def err(s: => String): Unit = {
+                println(Console.RED + logPrefix + s + Console.RESET)
+                lb.append(s)
+              }
               override def buffer[T](f: => T): T = f
             }
             val exitCode = Process(command.toList, cwd.toJava, extraEnv: _*).!(log)
