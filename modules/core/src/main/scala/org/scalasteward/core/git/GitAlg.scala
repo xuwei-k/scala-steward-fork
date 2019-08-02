@@ -227,7 +227,7 @@ object GitAlg {
         processAlg.exec(
           gitCmd :: command,
           cwd,
-          logPrefix = ""
+          logPrefix = "[" + cwd.name + "]"
         )
     }
 }
