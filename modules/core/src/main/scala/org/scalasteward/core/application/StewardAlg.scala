@@ -87,7 +87,7 @@ final class StewardAlg[F[_]](
         _ = {
           result.collect {
             case (r, Left(e)) =>
-              println(Console.RED + s"failed ${r} ${e}" + Console.RESET)
+              println(Console.RED + s"failed ${r.owner}/${r.repo} ${e}" + Console.RESET)
           }
         }
       } yield if (result.forall(_._2.isRight)) ExitCode.Success else ExitCode.Error
