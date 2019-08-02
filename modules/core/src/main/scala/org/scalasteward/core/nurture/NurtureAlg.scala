@@ -229,7 +229,7 @@ final class NurtureAlg[F[_]](
     val repo = d.repo
     for {
       result <- editAlg.applyUpdates(repo, data.map(_.update)).map(_.toSet)
-      filtered = data.map(_.update).filterNot(result)
+      filtered = data.map(_.update).filter(result)
       s <- gitAlg
         .containsChanges(repo)
         .ifM(
