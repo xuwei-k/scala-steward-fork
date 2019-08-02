@@ -156,6 +156,10 @@ object FilterAlg {
           // https://github.com/metabookmarks/sbt-plantuml-plugin/pull/10
           "2017.11"
         )
+      case ("org.eclipse.jetty", _, _, _) =>
+        List(
+          "10.0.0-alpha0"
+        )
       case ("org.http4s", _, _, _) =>
         List(
           // https://github.com/http4s/http4s/pull/2153
