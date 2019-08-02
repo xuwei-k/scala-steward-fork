@@ -78,23 +78,23 @@ object ProcessAlg {
           logPrefix: String,
           extraEnv: (String, String)*
       ): F[List[String]] =
-        logger.debug(s"Execute ${command.mkString_(" ")}") >>
-          F.delay {
-            val lb = ListBuffer.empty[String]
-            val log = new ProcessLogger {
-              override def out(s: => String): Unit = {
-                println(logPrefix + s)
-                lb.append(s)
-              }
-              override def err(s: => String): Unit = {
-                println(Console.RED + logPrefix + s + Console.RESET)
-                lb.append(s)
-              }
-              override def buffer[T](f: => T): T = f
+        F.delay {
+          val lb = ListBuffer.empty[String]
+          val log = new ProcessLogger {
+            override def out(s: => String): Unit = {
+              println(logPrefix + s)
+              lb.append(s)
             }
-            val exitCode = Process(command.toList, cwd.toJava, extraEnv: _*).!(log)
-            if (exitCode =!= 0) throw new IOException(lb.mkString("\n"))
-            lb.result()
+            override def err(s: => String): Unit = {
+              println(Console.RED + logPrefix + s + Console.RESET)
+              lb.append(s)
+            }
+            override def buffer[T](f: => T): T = f
           }
+          logger.debug(s"${logPrefix} Execute ${command.mkString_(" ")}")
+          val exitCode = Process(command.toList, cwd.toJava, extraEnv: _*).!(log)
+          if (exitCode =!= 0) throw new IOException(lb.mkString("\n"))
+          lb.result()
+        }
     }
 }

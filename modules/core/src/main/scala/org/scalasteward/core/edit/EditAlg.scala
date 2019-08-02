@@ -39,7 +39,7 @@ final class EditAlg[F[_]](
     workspaceAlg: WorkspaceAlg[F],
     F: Sync[F]
 ) {
-  def applyUpdate(repo: Repo, update: Update): F[Unit] =
+  def applyUpdate(repo: Repo, update: Update): F[Boolean] =
     if (scalafmt.isScalafmtUpdate(update))
       scalafmtAlg.editScalafmtConf(repo, update.nextVersion)
     else
@@ -51,53 +51,26 @@ final class EditAlg[F[_]](
           update.currentVersion,
           f => isSourceFile(f) && isFileSpecificTo(update)(f)
         )
-        noFilesFound = logger.warn("No files found that contain the current version")
-        _ <- files.toNel.fold(noFilesFound)(applyUpdateTo(_, update))
-      } yield ()
+        noFilesFound = logger
+          .warn("No files found that contain the current version")
+          .map(_ => false)
+        res <- files.toNel.fold(noFilesFound)(applyUpdateTo(_, update))
+      } yield res
 
-  def applyUpdates(repo: Repo, updates: NonEmptyList[Update]): F[List[Update]] = {
-    def updateFile(file: File, updates: NonEmptyList[Update]): F[List[Update]] =
-      F.delay {
-        val (contents, list) = updates.foldLeft((file.contentAsString, List.empty[Update])) {
-          case ((a, noChanges), b) =>
-            b.replaceAllIn(a) match {
-              case Some(x) =>
-                (x, noChanges)
-              case None =>
-                (a, b :: noChanges)
-            }
-        }
-        file.write(contents)
-        list.reverse
+  def applyUpdates(repo: Repo, updates: NonEmptyList[Update]): F[List[Update]] =
+    updates
+      .traverse { u =>
+        applyUpdate(repo = repo, update = u).map(_ -> u)
       }
-
-    workspaceAlg.repoDir(repo).flatMap { dir =>
-      Functor[F].map(
-        FileAlg
-          .create[F]
-          .walk(dir)
-          .filter(isSourceFile)
-          .evalMap(updateFile(_, updates))
-          .compile
-          .toList
-      ) { list =>
-        val size = list.size
-        list.flatten
-          .groupBy(identity)
-          .map { case (k, v) => k -> v.size }
-          .filter(_._2 === size)
-          .keys
-          .toList
+      .map {
+        _.collect { case (changed, update) if changed => update }
       }
-    }
-  }
-
-  def applyUpdateTo[G[_]: Traverse](files: G[File], update: Update): F[Unit] = {
+  def applyUpdateTo[G[_]: Traverse](files: G[File], update: Update): F[Boolean] = {
     val actions = UpdateHeuristic.all.map { heuristic =>
       logger.info(s"Trying heuristic '${heuristic.name}'") >>
         fileAlg.editFiles(files, heuristic.replaceF(update))
     }
-    bindUntilTrue(actions).void
+    bindUntilTrue(actions)
   }
 
   def applyScalafixMigrations(repo: Repo, update: Update): F[Unit] =
