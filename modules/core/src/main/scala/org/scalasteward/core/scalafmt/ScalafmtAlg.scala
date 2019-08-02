@@ -28,7 +28,7 @@ import scala.util.matching.Regex
 trait ScalafmtAlg[F[_]] {
   def getScalafmtVersion(repo: Repo): F[Option[Version]]
 
-  def editScalafmtConf(repo: Repo, nextVersion: String)(implicit F: MonadThrowable[F]): F[Unit]
+  def editScalafmtConf(repo: Repo, nextVersion: String)(implicit F: MonadThrowable[F]): F[Boolean]
 
   final def getScalafmtUpdate(repo: Repo)(implicit F: Functor[F]): F[Option[Update.Single]] =
     getScalafmtVersion(repo).map(_.flatMap(findScalafmtUpdate))
@@ -52,11 +52,11 @@ object ScalafmtAlg {
 
     override def editScalafmtConf(repo: Repo, nextVersion: String)(
         implicit F: MonadThrowable[F]
-    ): F[Unit] =
+    ): F[Boolean] =
       for {
         repoDir <- workspaceAlg.repoDir(repo)
         scalafmtConfFile = repoDir / ".scalafmt.conf"
-        _ <- fileAlg.editFile(
+        res <- fileAlg.editFile(
           scalafmtConfFile,
           content => {
             for {
@@ -68,6 +68,6 @@ object ScalafmtAlg {
             } yield changed
           }
         )
-      } yield ()
+      } yield res
   }
 }
