@@ -107,6 +107,7 @@ object Repos {
     Repo("wartremover", "wartremover"),
     Repo("wartremover", "wartremover-contrib"),
     Repo("wartremover", "own-wart-example"),
+    Repo("seratch", "AWScala"),
     Repo("scopt", "scopt"),
     Repo("scalaj", "scalaj-http"),
     Repo("flyway", "flyway-play"),
