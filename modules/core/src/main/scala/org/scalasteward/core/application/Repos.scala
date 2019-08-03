@@ -55,6 +55,7 @@ object Repos {
     Repo("xuwei-k", "sbt-conflict-classes"),
     Repo("xuwei-k", "scalajspack"),
     Repo("xuwei-k", "wartremover-scalikejdbc"),
+    Repo("xuwei-k", "scodec-msgpack"),
     Repo("scalaprops", "scalaprops"),
     Repo("scalaprops", "scalaprops-native-example"),
     Repo("scalaprops", "scalaprops-examples"),
