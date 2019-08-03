@@ -151,6 +151,7 @@ object Repos {
     Repo("atnos-org", "producer"),
     Repo("runarorama", "latr"),
     Repo("t2v", "holidays"),
+    Repo("dispatch", "reboot"),
     Repo("etaty", "rediscala"),
     //    Repo("scalaz", "scalaz-deriving"), // TODO
     Repo("scalaz", "testz"),
