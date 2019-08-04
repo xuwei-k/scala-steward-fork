@@ -155,7 +155,7 @@ object Repos {
     Repo("t2v", "holidays"),
     Repo("dispatch", "reboot"),
     Repo("etaty", "rediscala"),
-    //    Repo("scalaz", "scalaz-deriving"), // TODO
+    Repo("scalaz", "scalaz-deriving"),
     Repo("scalaz", "testz"),
     Repo("scalaz", "scalaz-sbt"),
     Repo("scalapb", "scalapb-grpcweb"),
