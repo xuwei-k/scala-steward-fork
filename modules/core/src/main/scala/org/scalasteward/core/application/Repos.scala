@@ -151,6 +151,7 @@ object Repos {
     Repo("atnos-org", "origami"),
     Repo("atnos-org", "producer"),
     Repo("runarorama", "latr"),
+    Repo("debasishg", "scala-redis"),
     Repo("t2v", "holidays"),
     Repo("dispatch", "reboot"),
     Repo("etaty", "rediscala"),
