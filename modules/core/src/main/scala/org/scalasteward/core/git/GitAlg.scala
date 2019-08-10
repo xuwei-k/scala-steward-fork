@@ -100,7 +100,7 @@ object GitAlg {
         for {
           repoDir <- workspaceAlg.repoDir(repo)
           trimMessage = {
-            val max = 2048
+            val max = 2500
             if (message.length > max) {
               println(s"too long commit message! ${message.length}")
               message.linesIterator.next

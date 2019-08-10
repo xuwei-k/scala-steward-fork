@@ -254,7 +254,14 @@ final class NurtureAlg[F[_]](
                         newer = update.newerVersions.head
                       )
                     }
-                    .map(_.mkString("\n\n"))
+                    .map { mimaResultList =>
+                      val fullSize = mimaResultList.map(_.full.length).sum
+                      if (fullSize < MimaAlg.defaultLimit) {
+                        mimaResultList.map(_.full).mkString("\n\n")
+                      } else {
+                        mimaResultList.map(_.simple).mkString("\n\n").take(MimaAlg.defaultLimit)
+                      }
+                    }
                   message = filtered match {
                     case List(x) =>
                       git.commitMsgFor(x)
@@ -319,7 +326,7 @@ final class NurtureAlg[F[_]](
   def commitAndPush(data: UpdateData): F[Unit] =
     for {
       _ <- logger.info("Commit and push changes")
-      binaryIssues <- mima.backwardBinaryIssues(
+      binaryIssues <- mima.backwardBinaryIssuesString(
         groupId = data.update.groupId,
         artifactId = data.update.artifactId,
         current = data.update.currentVersion,
@@ -356,7 +363,7 @@ final class NurtureAlg[F[_]](
     for {
       _ <- logger.info(s"Create PR ${data.updateBranch.name}")
       branchName = vcs.createBranch(config.vcsType, data.fork, data.update)
-      binaryIssues <- mima.backwardBinaryIssues(
+      binaryIssues <- mima.backwardBinaryIssuesString(
         groupId = data.update.groupId,
         artifactId = data.update.artifactId,
         current = data.update.currentVersion,
@@ -434,7 +441,7 @@ final class NurtureAlg[F[_]](
 
   def commitAndCheck(data: UpdateData): F[Boolean] =
     for {
-      binaryIssues <- mima.backwardBinaryIssues(
+      binaryIssues <- mima.backwardBinaryIssuesString(
         groupId = data.update.groupId,
         artifactId = data.update.artifactId,
         current = data.update.currentVersion,

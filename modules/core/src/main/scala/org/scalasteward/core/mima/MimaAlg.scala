@@ -19,6 +19,7 @@ package org.scalasteward.core.mima
 import java.io.File
 
 import cats.Monad
+import cats.data.NonEmptyList
 import cats.syntax.eq._
 import cats.instances.string._
 import coursier._
@@ -30,8 +31,48 @@ import com.typesafe.tools.mima.core.util.log.Logging
 import scala.collection.concurrent.TrieMap
 import scala.util.control.NonFatal
 
+sealed abstract class MimaResult {
+  def simple: String =
+    this match {
+      case MimaResult.Imcompatible(values, lib) =>
+        s"""`"${lib.groupId}" % "${lib.artifactId}" % "${lib.current}" => "${lib.newer}"` found ${values.size} binary incompatibilities"""
+      case _ =>
+        ""
+    }
+  def full: String =
+    this match {
+      case MimaResult.Imcompatible(values, _) =>
+        simple + "\n\n" + values.sorted.toList.mkString("```\n", "\n", "\n```")
+      case _ =>
+        ""
+    }
+  def asString(limit: Int): String =
+    this match {
+      case MimaResult.Imcompatible(_, _) =>
+        if (full.length > limit) {
+          simple
+        } else {
+          full
+        }
+      case _ =>
+        ""
+    }
+}
+object MimaResult {
+  case object Compatible extends MimaResult
+  final case class Imcompatible(values: NonEmptyList[String], lib: Lib) extends MimaResult
+  final case class Err(err: Throwable) extends MimaResult
+}
+
 trait MimaAlg[F[_]] {
   def backwardBinaryIssues(
+      groupId: String,
+      artifactId: String,
+      current: String,
+      newer: String
+  ): F[MimaResult]
+
+  def backwardBinaryIssuesString(
       groupId: String,
       artifactId: String,
       current: String,
@@ -39,24 +80,34 @@ trait MimaAlg[F[_]] {
   ): F[String]
 }
 
+case class Lib(groupId: String, artifactId: String, current: String, newer: String)
+
 object MimaAlg {
+  private[this] val cache: TrieMap[Lib, MimaResult] = TrieMap.empty[Lib, MimaResult]
 
-  private case class Arg(groupId: String, artifactId: String, current: String, newer: String)
-
-  private[this] val cache: TrieMap[Arg, String] = TrieMap.empty[Arg, String]
+  def defaultLimit = 2048
 
   def create[F[_]](
       implicit F: Monad[F],
       log: Logger[F]
   ): MimaAlg[F] =
     new MimaAlg[F] {
+
+      override def backwardBinaryIssuesString(
+          groupId: String,
+          artifactId: String,
+          current: String,
+          newer: String
+      ): F[String] =
+        F.map(backwardBinaryIssues(groupId, artifactId, current, newer))(_.asString(defaultLimit))
+
       override def backwardBinaryIssues(
           groupId: String,
           artifactId: String,
           current: String,
           newer: String
-      ): F[String] = {
-        val arg = Arg(
+      ): F[MimaResult] = {
+        val lib = Lib(
           groupId = groupId,
           artifactId = artifactId,
           current = current,
@@ -64,7 +115,7 @@ object MimaAlg {
         )
         F.point(
           cache.getOrElseUpdate(
-            arg,
+            lib,
             backwardBinaryIssues0(
               groupId = groupId,
               artifactId = artifactId,
@@ -80,7 +131,7 @@ object MimaAlg {
           artifactId: String,
           current: String,
           newer: String
-      ): String = {
+      ): MimaResult = {
 
         def fetch0(v: String, artifactId0: String, attributes: Map[String, String]): File =
           Fetch[coursier.util.Task]()
@@ -139,25 +190,27 @@ object MimaAlg {
 
           val description = s"${groupId}:${artifactId}:${current} => ${newer}"
 
-          val result = if (problems.isEmpty) {
-            println("binary compatible!😊 " + description)
-            ""
-          } else {
-            val e = problems
-              .map(_.description(description))
-              .sorted
-              .mkString("```\n", "\n", "\n```")
-
-            println(e)
-
-            e
+          problems match {
+            case Nil =>
+              println("binary compatible!😊 " + description)
+              MimaResult.Compatible
+            case x :: xs =>
+              val res = MimaResult.Imcompatible(
+                NonEmptyList.of(x, xs: _*).map(_.description(description)),
+                Lib(
+                  groupId = groupId,
+                  artifactId = artifactId,
+                  current = current,
+                  newer = newer
+                )
+              )
+              println(res.asString(Int.MaxValue))
+              res
           }
-
-          result
         } catch {
           case e: Throwable =>
             e.printStackTrace()
-            ""
+            MimaResult.Err(e)
         }
       }
     }
