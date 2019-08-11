@@ -188,15 +188,13 @@ object MimaAlg {
           val problems =
             makeMima(log).collectProblems(currentJar.getAbsolutePath, newJar.getAbsolutePath)
 
-          val description = s"${groupId}:${artifactId}:${current} => ${newer}"
-
           problems match {
             case Nil =>
-              println("binary compatible!😊 " + description)
+              println("binary compatible!😊 ${groupId}:${artifactId}:${current} => ${newer}")
               MimaResult.Compatible
             case x :: xs =>
               val res = MimaResult.Imcompatible(
-                NonEmptyList.of(x, xs: _*).map(_.description(description)),
+                NonEmptyList.of(x, xs: _*).map(_.description("")),
                 Lib(
                   groupId = groupId,
                   artifactId = artifactId,
