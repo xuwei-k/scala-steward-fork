@@ -190,7 +190,7 @@ object MimaAlg {
 
           problems match {
             case Nil =>
-              println("binary compatible!😊 ${groupId}:${artifactId}:${current} => ${newer}")
+              println(s"binary compatible!😊 ${groupId}:${artifactId}:${current} => ${newer}")
               MimaResult.Compatible
             case x :: xs =>
               val res = MimaResult.Imcompatible(
