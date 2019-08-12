@@ -21,7 +21,21 @@ import org.scalasteward.core.data.{Update, Version}
 import org.scalasteward.core.util.Nel
 
 package object scalafmt {
-  val latestScalafmtVersion: Version = Version("2.0.0")
+  val latestScalafmtVersion: Version = {
+    try {
+      val x = scala.xml.XML.load(
+        new java.net.URL(
+          "https://repo1.maven.org/maven2/org/scalameta/scalafmt-core_2.12/maven-metadata.xml"
+        )
+      )
+      Version((x \\ "latest").text)
+    } catch {
+      case scala.util.control.NonFatal(e) =>
+        e.printStackTrace()
+        Version("2.0.0")
+    }
+  }
+  println("latest scalafmt version = " + latestScalafmtVersion)
   val scalafmtGroupId = "org.scalameta"
   val scalafmtArtifactId = "scalafmt"
 
