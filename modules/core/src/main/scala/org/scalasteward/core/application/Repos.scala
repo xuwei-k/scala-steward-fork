@@ -173,7 +173,7 @@ object Repos {
     Repo("scalaz", "scalaz")
   )
 
-  val repositories = (defaultRepos ::: anotherRepos).sortBy(_.show) ::: lasts
+  val repositories = Repo("higherkindness", "droste") :: Nil //(defaultRepos ::: anotherRepos).sortBy(_.show) ::: lasts
 
   def partial[A](x: Int, y: Int, values: List[A]): List[A] = {
     val n0 = math.max(values.size / y, 0)
