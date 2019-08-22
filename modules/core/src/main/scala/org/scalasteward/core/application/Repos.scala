@@ -155,6 +155,7 @@ object Repos {
     Repo("btlines", "grpcakkastream"),
     Repo("etorreborre", "specs2"),
     Repo("atnos-org", "eff"),
+    Repo("b-studios", "scala-effekt"),
     Repo("atnos-org", "origami"),
     Repo("atnos-org", "producer"),
     Repo("runarorama", "latr"),
