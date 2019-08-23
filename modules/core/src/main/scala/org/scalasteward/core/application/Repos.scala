@@ -57,6 +57,7 @@ object Repos {
     Repo("xuwei-k", "wartremover-scalikejdbc"),
     Repo("xuwei-k", "scodec-msgpack"),
     Repo("scalaprops", "scalaprops"),
+    Repo("scalaprops", "scalaprops-deriving"),
     Repo("scalaprops", "scalaprops-native-example"),
     Repo("scalaprops", "scalaprops-examples"),
     Repo("scalaprops", "scalaprops-cross-example"),
