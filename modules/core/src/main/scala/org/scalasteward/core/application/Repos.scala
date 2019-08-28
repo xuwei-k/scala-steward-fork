@@ -148,7 +148,7 @@ object Repos {
     Repo("sbt", "util"),
     Repo("sbt", "io"),
     Repo("sbt", "launcher"),
-    Repo("sbt", "zinc"),
+    // Repo("sbt", "zinc"),
     Repo("sbt", "sbinary"),
     Repo("sbt", "junit-interface"),
     Repo("tototoshi", "sbt-slick-codegen"),
