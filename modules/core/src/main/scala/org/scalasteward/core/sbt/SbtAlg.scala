@@ -182,7 +182,7 @@ object SbtAlg {
         for {
           repoDir <- workspaceAlg.repoDir(repo)
           cmd = sbtCmd(repo.testCommands)
-          _ <- ignoreOptsFiles(repoDir)(processAlg.exec(cmd, repoDir, s"[${repo.repo}]"))
+          _ <- processAlg.exec(cmd, repoDir, s"[${repo.repo}]")
         } yield ()
     }
 }
