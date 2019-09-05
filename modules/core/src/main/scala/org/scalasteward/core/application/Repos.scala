@@ -63,7 +63,14 @@ object Repos {
     Repo("scalaprops", "scalaprops-cross-example"),
     Repo("scalaprops", "scalaprops-magnolia"),
     Repo("scalaprops", "scalaprops-shapeless"),
-    Repo("scalaprops", "sbt-scalaprops"),
+    Repo(
+      "scalaprops",
+      "sbt-scalaprops",
+      testCommands = List(
+        "test",
+        "^scripted"
+      )
+    ),
     Repo("msgpack4z", "msgpack4z-core"),
     Repo("msgpack4z", "msgpack4z-java"),
     Repo("msgpack4z", "msgpack4z-native"),
@@ -114,7 +121,16 @@ object Repos {
     Repo("dwango", "scala_text"),
     Repo("dwango", "slack-webhook-appender"),
     Repo("unfiltered", "unfiltered"),
-    Repo("unfiltered", "website"),
+    Repo(
+      "unfiltered",
+      "website",
+      testCommands = List(
+        // TODO update sbt plugins
+        // https://github.com/unfiltered/website/blob/0cc9371cf45c3e31050bfdabd275e179e38302d2/.travis.yml#L6
+        "compile",
+        "paradox:paradox"
+      )
+    ),
     Repo("unfiltered", "unfiltered-websockets.g8"),
     Repo("unfiltered", "unfiltered-netty.g8"),
     Repo("unfiltered", "unfiltered-gae.g8"),
@@ -124,7 +140,15 @@ object Repos {
     Repo("unfiltered", "unfiltered-war.g8"),
     Repo("unfiltered", "unfiltered-slick.g8"),
     Repo("json4s", "json4s"),
-    Repo("wartremover", "wartremover"),
+    Repo(
+      "wartremover",
+      "wartremover",
+      testCommands = List(
+        "test",
+        "+ core/publishLocal",
+        "+ sbt-plugin/scripted"
+      )
+    ),
     Repo("wartremover", "wartremover-contrib"),
     Repo("wartremover", "own-wart-example"),
     Repo("seratch", "AWScala"),
@@ -146,14 +170,55 @@ object Repos {
       u.groupId =!= "org.apache.httpcomponents" // tests fail
     }),
     Repo("scalatra", "scalamd"),
-    Repo("scalatra", "sbt-scalatra"),
+    Repo(
+      "scalatra",
+      "sbt-scalatra",
+      testCommands = List(
+        "^scripted"
+      )
+    ),
     Repo("scalatra", "scalatra.g8"),
-    Repo("sbt", "sbt-protobuf"),
+    Repo(
+      "sbt",
+      "sbt-protobuf",
+      testCommands = List(
+        "test",
+        "^scripted"
+      )
+    ),
     Repo("sbt", "sbt-appengine"),
-    Repo("sbt", "sbt-assembly"),
-    Repo("sbt", "sbt-buildinfo"),
-    Repo("sbt", "sbt-ghpages"),
-    Repo("sbt", "sbt-sriracha"),
+    Repo(
+      "sbt",
+      "sbt-assembly",
+      testCommands = List(
+        "test",
+        "^scripted"
+      )
+    ),
+    Repo(
+      "sbt",
+      "sbt-buildinfo",
+      testCommands = List(
+        "test",
+        "^scripted"
+      )
+    ),
+    Repo(
+      "sbt",
+      "sbt-ghpages",
+      testCommands = List(
+        "test",
+        "^scripted"
+      )
+    ),
+    Repo(
+      "sbt",
+      "sbt-sriracha",
+      testCommands = List(
+        "test",
+        "^scripted"
+      )
+    ),
     Repo("sbt", "sbt-houserules"),
     Repo("sbt", "contraband"),
     Repo("sbt", "util"),
@@ -162,7 +227,14 @@ object Repos {
     // Repo("sbt", "zinc"),
     Repo("sbt", "sbinary"),
     Repo("sbt", "junit-interface"),
-    Repo("tototoshi", "sbt-slick-codegen"),
+    Repo(
+      "tototoshi",
+      "sbt-slick-codegen",
+      testCommands = List(
+        "test",
+        "^scripted"
+      )
+    ),
     Repo("tototoshi", "slick-joda-mapper"),
     Repo("tototoshi", "scala-csv"),
     Repo("folone", "poi.scala"),
@@ -186,7 +258,14 @@ object Repos {
     Repo("etaty", "rediscala"),
     Repo("scalaz", "scalaz-deriving"),
     Repo("scalaz", "testz"),
-    Repo("scalaz", "scalaz-sbt"),
+    Repo(
+      "scalaz",
+      "scalaz-sbt",
+      testCommands = List(
+        "test",
+        "^scripted"
+      )
+    ),
     Repo("scalapb", "scalapb-grpcweb"),
     Repo("scalapb", "scalapb-template.g8")
   ).distinct.map(_.copy(createPullRequest = false))
