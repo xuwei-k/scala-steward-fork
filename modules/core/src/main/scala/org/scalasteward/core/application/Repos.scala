@@ -223,7 +223,13 @@ object Repos {
     Repo("sbt", "contraband"),
     Repo("sbt", "util"),
     Repo("sbt", "io"),
-    Repo("sbt", "launcher"),
+    Repo(
+      "sbt",
+      "launcher",
+      testCommands = List(
+        "compile" // https://github.com/sbt/launcher/blob/fbe82523cdfe5453642f1dccbd2415cc806093a1/project/Release.scala#L55
+      )
+    ),
     // Repo("sbt", "zinc"),
     Repo("sbt", "sbinary"),
     Repo("sbt", "junit-interface"),
