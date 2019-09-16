@@ -89,6 +89,8 @@ object FilterAlg {
           case ("org.postgresql", "postgresql", _, "9.4.1212")               => false
           case ("org.scala-sbt", "sbt-launch", _, _)                         => false
 
+          case ("com.jsuereth", "sbt-pgp", _, v) if v.startsWith("2.") => false
+
           case ("org.scalaz.stream", "scalaz-stream", _, "0.8.6") => false
 
           case ("org.scalaz", _, _, ScalazVersions()) => false
