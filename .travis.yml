@@ -3,7 +3,7 @@ dist: xenial
 jdk:
 - openjdk8
 scala:
-- 2.12.9
+- 2.12.10
 cache:
   directories:
   - "$HOME/.ivy2/cache"
