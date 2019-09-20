@@ -100,7 +100,9 @@ object Repos {
 
   val anotherRepos = List(
     Repo("sirthias", "parboiled2"),
-    Repo("sirthias", "parboiled"),
+    Repo("sirthias", "parboiled", filter = u => {
+      u.groupId =!= "org.testng"
+    }),
     Repo("foundweekends", "giter8"),
     Repo("foundweekends", "knockoff"),
     Repo("foundweekends", "conscript"),
