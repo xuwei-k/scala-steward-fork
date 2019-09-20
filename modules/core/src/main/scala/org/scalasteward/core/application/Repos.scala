@@ -67,8 +67,7 @@ object Repos {
       "scalaprops",
       "sbt-scalaprops",
       testCommands = List(
-        "test",
-        "^scripted"
+        "test"
       )
     ),
     Repo("msgpack4z", "msgpack4z-core"),
@@ -80,6 +79,7 @@ object Repos {
     Repo("msgpack4z", "msgpack4z-jawn"),
     Repo("msgpack4z", "msgpack4z-native"),
     // TODO scalapb projects does not work with sbt 1.3 due to protobuf conflict?
+    /*
     Repo("scalapb-json", "scalapb-playjson", filter = u => {
       u.groupId =!= "org.scala-sbt"
     }),
@@ -89,12 +89,13 @@ object Repos {
     Repo("scalapb-json", "scalapb-argonaut", filter = u => {
       u.groupId =!= "org.scala-sbt"
     }),
-    Repo("scalapb-json", "protoc-lint", filter = u => {
-      u.groupId =!= "org.scala-sbt"
-    }),
     Repo("scalapb-json", "scalapb-json-common", filter = u => {
       u.groupId =!= "org.scala-sbt"
     })
+    */
+    Repo("scalapb-json", "protoc-lint", filter = u => {
+      u.groupId =!= "org.scala-sbt"
+    }),
   ).distinct.map(_.copy(createPullRequest = true))
 
   val anotherRepos = List(
