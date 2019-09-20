@@ -121,7 +121,6 @@ object Repos {
     // Repo("dwango", "S99"), // TODO re-enable when merged https://github.com/dwango/S99/pull/84
     Repo("dwango", "scala_text"),
     Repo("dwango", "slack-webhook-appender"),
-    Repo("unfiltered", "unfiltered"),
     Repo(
       "unfiltered",
       "website",
