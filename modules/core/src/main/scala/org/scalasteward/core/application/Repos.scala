@@ -120,8 +120,8 @@ object Repos {
       ).contains(u.groupId)
     }),
     Repo("nscala-time", "nscala-time"),
-    // Repo("dwango", "S99"), // TODO re-enable when merged https://github.com/dwango/S99/pull/84
-    Repo("dwango", "scala_text"),
+    Repo("scalajp", "S99"),
+    Repo("scalajp", "scala_text"),
     Repo("dwango", "slack-webhook-appender"),
     Repo(
       "unfiltered",
