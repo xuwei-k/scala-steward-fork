@@ -77,6 +77,7 @@ object Repos {
     Repo("msgpack4z", "msgpack4z-argonaut"),
     Repo("msgpack4z", "msgpack4z-play"),
     Repo("msgpack4z", "msgpack4z-jawn"),
+    Repo("msgpack4z", "msgpack4z-api"),
     Repo("msgpack4z", "msgpack4z-native"),
     // TODO scalapb projects does not work with sbt 1.3 due to protobuf conflict?
     /*
