@@ -154,7 +154,7 @@ object Repos {
     ),
     Repo("wartremover", "wartremover-contrib"),
     Repo("wartremover", "own-wart-example"),
-    Repo("seratch", "AWScala"),
+    // Repo("seratch", "AWScala"),
     Repo("scopt", "scopt"),
     Repo("scalaj", "scalaj-http"),
     Repo("flyway", "flyway-play"),
@@ -167,7 +167,7 @@ object Repos {
       u.groupId =!= "com.h2database"
     }),
     //   Repo("skinny-framework", "skinny-micro"),
-    Repo("skinny-framework", "skinny-framework"),
+    //   Repo("skinny-framework", "skinny-framework"),
     Repo("scalate", "scalate"),
     Repo("scalatra", "scalatra", filter = u => {
       u.groupId =!= "org.apache.httpcomponents" // tests fail
@@ -251,10 +251,10 @@ object Repos {
     Repo("eed3si9n", "expecty"),
     Repo("eed3si9n", "gigahorse"),
     Repo("eed3si9n", "sjson-new"),
-    Repo("btlines", "grpcgateway"),
+    // Repo("btlines", "grpcgateway"),
     Repo("btlines", "pbdirect"),
-    Repo("btlines", "grpcmonix"),
-    Repo("btlines", "grpcakkastream"),
+    // Repo("btlines", "grpcmonix"),
+    // Repo("btlines", "grpcakkastream"),
     Repo("atnos-org", "eff"),
     Repo("b-studios", "scala-effekt"),
     Repo("runarorama", "latr"),
