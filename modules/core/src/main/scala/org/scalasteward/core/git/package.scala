@@ -21,7 +21,7 @@ import org.scalasteward.core.update.show
 
 package object git {
   def branchFor(updates: Update*): Branch = {
-    val original = updates.toList
+    val original = updates.toList.distinct
       .sortBy(u => (u.name, u.nextVersion))
       .map(u => s"${u.name}-${u.nextVersion}")
       .mkString("update-", "-", "")
