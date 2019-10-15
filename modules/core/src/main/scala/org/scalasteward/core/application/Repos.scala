@@ -157,7 +157,8 @@ object Repos {
     Repo("scalaj", "scalaj-http"),
     Repo("flyway", "flyway-play"),
     Repo("scalikejdbc", "scalikejdbc", filter = u => {
-      (u.groupId =!= "org.mockito") && (u.groupId =!= "org.apache.derby")
+      // tests fail with h2 version 1.4.200
+      (u.groupId =!= "org.mockito") && (u.groupId =!= "org.apache.derby") && (u.groupId =!= "com.h2database")
     }),
     Repo("scalikejdbc", "scalikejdbc-play-support"),
     Repo("scalikejdbc", "scalikejdbc-async"),
