@@ -94,9 +94,7 @@ object Repos {
       u.groupId =!= "org.scala-sbt"
     })
     */
-    Repo("scalapb-json", "protoc-lint", filter = u => {
-      u.groupId =!= "org.scala-sbt"
-    }),
+    Repo("scalapb-json", "protoc-lint")
   ).distinct.map(_.copy(createPullRequest = true))
 
   val anotherRepos = List(
