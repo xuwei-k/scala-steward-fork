@@ -121,7 +121,6 @@ object Repos {
     Repo("nscala-time", "nscala-time"),
     Repo("scalajp", "S99"),
     Repo("scalajp", "scala_text"),
-    Repo("dwango", "slack-webhook-appender"),
     Repo(
       "unfiltered",
       "website",
