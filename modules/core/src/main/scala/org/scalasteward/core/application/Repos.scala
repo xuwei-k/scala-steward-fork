@@ -256,7 +256,6 @@ object Repos {
     Repo("btlines", "pbdirect"),
     // Repo("btlines", "grpcmonix"),
     // Repo("btlines", "grpcakkastream"),
-    Repo("atnos-org", "eff"),
     Repo("b-studios", "scala-effekt"),
     Repo("runarorama", "latr"),
     Repo("debasishg", "scala-redis"),
