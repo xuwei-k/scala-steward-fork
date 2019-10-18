@@ -93,7 +93,7 @@ object Repos {
     Repo("scalapb-json", "scalapb-json-common", filter = u => {
       u.groupId =!= "org.scala-sbt"
     })
-    */
+     */
     Repo("scalapb-json", "protoc-lint")
   ).distinct.map(_.copy(createPullRequest = true))
 
@@ -158,10 +158,14 @@ object Repos {
     Repo("scopt", "scopt"),
     Repo("scalaj", "scalaj-http"),
     Repo("flyway", "flyway-play"),
-    Repo("scalikejdbc", "scalikejdbc", filter = u => {
-      // tests fail with h2 version 1.4.200
-      (u.groupId =!= "org.mockito") && (u.groupId =!= "org.apache.derby") && (u.groupId =!= "com.h2database")
-    }),
+    Repo(
+      "scalikejdbc",
+      "scalikejdbc",
+      filter = u => {
+        // tests fail with h2 version 1.4.200
+        (u.groupId =!= "org.mockito") && (u.groupId =!= "org.apache.derby") && (u.groupId =!= "com.h2database")
+      }
+    ),
     Repo("scalikejdbc", "scalikejdbc-play-support"),
     Repo("scalikejdbc", "scalikejdbc-async"),
     Repo("scalikejdbc", "csvquery", filter = u => {
