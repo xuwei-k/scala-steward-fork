@@ -22,17 +22,25 @@ import org.scalasteward.core.util.Nel
 
 package object scalafmt {
   val latestScalafmtVersion: Version = {
+    val default = Version("2.1.1")
     try {
       val x = scala.xml.XML.load(
         new java.net.URL(
           "https://repo1.maven.org/maven2/org/scalameta/scalafmt-core_2.12/maven-metadata.xml"
         )
       )
-      Version((x \\ "latest").text)
+      (x \ "versioning" \ "versions" \ "version")
+        .map(_.text)
+        .filterNot(v => v.contains("-RC") || v.contains("-M") || v.contains("SNAP"))
+        .map(Version(_))
+        .toList
+        .maximumOption(Version.versionOrder)
+        .getOrElse(default)
+
     } catch {
       case scala.util.control.NonFatal(e) =>
         e.printStackTrace()
-        Version("2.0.0")
+        default
     }
   }
   println("latest scalafmt version = " + latestScalafmtVersion)
