@@ -112,6 +112,7 @@ object Repos {
     }),
     Repo("gitbucket", "gitbucket", filter = u => {
       !Set(
+        "com.h2database",
         "com.nimbusds",
         "com.novell.ldap",
         "org.apache.sshd",
