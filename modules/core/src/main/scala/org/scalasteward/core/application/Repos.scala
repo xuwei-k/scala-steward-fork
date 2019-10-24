@@ -250,7 +250,7 @@ object Repos {
         "^scripted"
       )
     ),
-    Repo("tototoshi", "slick-joda-mapper"),
+    // Repo("tototoshi", "slick-joda-mapper"),
     Repo("tototoshi", "scala-csv"),
     Repo("folone", "poi.scala"),
     Repo("xdotai", "play-json-extensions"),
