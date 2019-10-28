@@ -179,6 +179,11 @@ object FilterAlg {
           // https://github.com/scalapb/protoc-bridge/issues/56
           "0.7.11"
         )
+      case ("com.thesamet", "sbt-protoc", _, _) =>
+        List(
+          // https://github.com/scalapb/protoc-bridge/issues/56
+          "0.99.26"
+        )
 
       case _ => List.empty
     }
