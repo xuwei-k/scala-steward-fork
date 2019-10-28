@@ -174,6 +174,11 @@ object FilterAlg {
           // https://github.com/lightbend/migration-manager/pull/260
           "3.2.0-SNAP10"
         )
+      case ("com.thesamet.scalapb", "protoc-bridge", _, _) =>
+        List(
+          // https://github.com/scalapb/protoc-bridge/issues/56
+          "0.7.11"
+        )
 
       case _ => List.empty
     }
