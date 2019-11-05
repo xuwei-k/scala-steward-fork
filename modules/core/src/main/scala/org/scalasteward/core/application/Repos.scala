@@ -232,6 +232,10 @@ object Repos {
     Repo("sbt", "contraband"),
     Repo("sbt", "util"),
     Repo("sbt", "io"),
+    // TODO: not found sbt-git 0.8.5 (sbt-houserules 0.3.1 depends on sbt-git)
+    // https://github.com/sbt/sbt-houserules/blob/v0.3.1/build.sbt#L13
+    // https://dl.bintray.com/sbt/sbt-plugin-releases/com.typesafe.sbt/sbt-git/scala_2.10/sbt_0.13/
+    /*
     Repo(
       "sbt",
       "launcher",
@@ -239,6 +243,7 @@ object Repos {
         "compile" // https://github.com/sbt/launcher/blob/fbe82523cdfe5453642f1dccbd2415cc806093a1/project/Release.scala#L55
       )
     ),
+    */
     // Repo("sbt", "zinc"),
     Repo("sbt", "sbinary"),
     Repo("sbt", "junit-interface"),
