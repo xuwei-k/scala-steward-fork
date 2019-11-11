@@ -120,8 +120,8 @@ object Repos {
       ).contains(u.groupId)
     }),
     Repo("nscala-time", "nscala-time"),
-    Repo("scalajp", "S99"),
-    Repo("scalajp", "scala_text"),
+    Repo("scala-text", "S99"),
+    Repo("scala-text", "scala_text"),
     Repo(
       "unfiltered",
       "website",
