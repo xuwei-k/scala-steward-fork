@@ -184,7 +184,11 @@ object FilterAlg {
           // https://github.com/scalapb/protoc-bridge/issues/56
           "0.99.26"
         )
-
+      case ("org.scala-js", _, _, _) =>
+        List(
+          //https://github.com/scala-js/scala-js/issues/3865
+          "0.6.30"
+        )
       case _ => List.empty
     }
 }
