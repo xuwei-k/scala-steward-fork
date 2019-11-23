@@ -228,7 +228,6 @@ object Repos {
         "^scripted"
       )
     ),
-    Repo("sbt", "sbt-houserules"),
     Repo("sbt", "contraband"),
     Repo("sbt", "util"),
     Repo("sbt", "io"),
