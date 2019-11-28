@@ -272,15 +272,6 @@ object Repos {
     Repo("dispatch", "reboot"),
     Repo("etaty", "rediscala"),
     Repo("scalaz", "scalaz-deriving"),
-    Repo("scalaz", "testz"),
-    Repo(
-      "scalaz",
-      "scalaz-sbt",
-      testCommands = List(
-        "test",
-        "^scripted"
-      )
-    ),
     Repo("scalapb", "scalapb-grpcweb"),
     Repo("scalapb", "scalapb-template.g8")
   ).distinct.map(_.copy(createPullRequest = false))
