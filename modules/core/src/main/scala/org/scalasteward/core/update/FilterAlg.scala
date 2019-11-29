@@ -83,6 +83,8 @@ object FilterAlg {
       case _ =>
         (update.groupId, update.artifactId, update.currentVersion, update.newerVersions.head) match {
           case (_, _, _, _) if update.currentVersion.endsWith(")") => false
+          case (_, _, current, newer) if (!current.toLowerCase.contains("alpha")) && newer.toLowerCase.contains("alpha") => false
+          case (_, _, current, newer) if (!current.toLowerCase.contains("beta")) && newer.toLowerCase.contains("beta") => false
 
           case ("mysql", "mysql-connector-java", _, v) if v.startsWith("8.") => false
           case ("org.postgresql", "postgresql", _, v) if v.startsWith("42.") => false
