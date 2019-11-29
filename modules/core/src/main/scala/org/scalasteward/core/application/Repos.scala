@@ -273,7 +273,7 @@ object Repos {
     Repo("etaty", "rediscala"),
     Repo("scalaz", "scalaz-deriving"),
     Repo("scalapb", "scalapb-grpcweb"),
-    Repo("scalapb", "scalapb-template.g8")
+//    Repo("scalapb", "scalapb-template.g8") // TODO borken https://github.com/scalapb/scalapb-template.g8/commit/99c094dc1549
   ).distinct.map(_.copy(createPullRequest = false))
 
   private[this] val lasts = List(
