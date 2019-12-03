@@ -53,7 +53,8 @@ package object scalafix {
         Nel.of(
           "https://raw.githubusercontent.com/typelevel/cats/master/scalafix/rules/src/main/scala/fix/Cats_v1_0_0.scala"
         )
-      ),
+      )
+      /*
       Migration(
         "org.scalatest",
         Nel.of("scalatest".r),
@@ -64,6 +65,7 @@ package object scalafix {
         ),
         Some("test")
       )
+      */
     )
 
   def findMigrations(update: Update): List[Migration] =
