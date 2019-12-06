@@ -230,7 +230,7 @@ object Repos {
     ),
     Repo("sbt", "contraband"),
     // Repo("sbt", "util"),
-    Repo("sbt", "io"),
+    // Repo("sbt", "io"),
     // TODO: not found sbt-git 0.8.5 (sbt-houserules 0.3.1 depends on sbt-git)
     // https://github.com/sbt/sbt-houserules/blob/v0.3.1/build.sbt#L13
     // https://dl.bintray.com/sbt/sbt-plugin-releases/com.typesafe.sbt/sbt-git/scala_2.10/sbt_0.13/
