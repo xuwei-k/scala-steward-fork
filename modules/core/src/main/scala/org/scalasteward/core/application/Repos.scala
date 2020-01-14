@@ -265,7 +265,9 @@ object Repos {
     Repo("btlines", "pbdirect"),
     // Repo("btlines", "grpcmonix"),
     // Repo("btlines", "grpcakkastream"),
-    Repo("b-studios", "scala-effekt"),
+    Repo("b-studios", "scala-effekt", filter = u => {
+      u.groupId =!= "com.47deg" // TODO sbt-microsites
+    }),
     Repo("runarorama", "latr"),
     Repo("debasishg", "scala-redis"),
     Repo("t2v", "holidays"),
