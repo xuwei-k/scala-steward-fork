@@ -116,7 +116,9 @@ object Repos {
         "com.nimbusds",
         "com.novell.ldap",
         "org.apache.sshd",
-        "org.ec4j.core"
+        "org.ec4j.core",
+        "com.typesafe.akka", // don't update akka 2.6
+        "com.enragedginger" //  don't update akka 2.6
       ).contains(u.groupId)
     }),
     Repo("nscala-time", "nscala-time"),
