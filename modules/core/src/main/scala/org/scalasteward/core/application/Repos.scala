@@ -174,7 +174,7 @@ object Repos {
     }),
     //   Repo("skinny-framework", "skinny-micro"),
     //   Repo("skinny-framework", "skinny-framework"),
-    Repo("scalate", "scalate"),
+    // Repo("scalate", "scalate"), // TODO https://github.com/scalate/scalate/pull/255
     Repo("scalatra", "scalatra", filter = u => {
       u.groupId =!= "org.apache.httpcomponents" // tests fail
     }),
