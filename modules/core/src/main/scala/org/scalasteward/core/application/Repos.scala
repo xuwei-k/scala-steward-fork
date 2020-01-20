@@ -275,7 +275,7 @@ object Repos {
     Repo("t2v", "holidays"),
     Repo("dispatch", "reboot"),
     Repo("etaty", "rediscala"),
-    Repo("scalaz", "scalaz-deriving"),
+    // Repo("scalaz", "scalaz-deriving"), TODO update scalafix dependency
     Repo("scalapb", "scalapb-grpcweb"),
     Repo("scalapb", "scalapb-template.g8")
   ).distinct.map(_.copy(createPullRequest = false))
