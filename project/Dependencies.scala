@@ -27,7 +27,7 @@ object Dependencies {
   val kindProjector = "org.typelevel" %% "kind-projector" % "0.10.3"
   val log4catsSlf4j = "io.chrisdavenport" %% "log4cats-slf4j" % "0.3.0"
   val logbackClassic = "ch.qos.logback" % "logback-classic" % "1.2.3"
-  val mima = "com.typesafe" %% "mima-core" % "0.6.0"
+  val mima = "com.typesafe" %% "mima-core" % "0.6.1"
   val monocleCore = "com.github.julien-truffaut" %% "monocle-core" % "1.5.1-cats"
   val refined = "eu.timepit" %% "refined" % Versions.refined
   val refinedCats = "eu.timepit" %% "refined-cats" % Versions.refined
