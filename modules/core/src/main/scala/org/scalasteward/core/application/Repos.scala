@@ -178,6 +178,8 @@ object Repos {
     //   Repo("skinny-framework", "skinny-framework"),
     // Repo("scalate", "scalate"), // TODO https://github.com/scalate/scalate/pull/255
     Repo("scalatra", "scalatra", filter = u => {
+      u.groupId =!= "io.dropwizard.metrics" &&
+      u.groupId =!= "nl.grons" &&
       u.groupId =!= "org.apache.httpcomponents" // tests fail
     }),
     Repo("scalatra", "scalamd"),
