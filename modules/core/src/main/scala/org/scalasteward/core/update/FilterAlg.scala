@@ -191,6 +191,12 @@ object FilterAlg {
           //https://github.com/scala-js/scala-js/issues/3865
           "0.6.30"
         )
+      case ("org.scalameta", "scalafmt-core", _, _) =>
+        List(
+          // https://github.com/scalameta/scalafmt/issues/1599
+          // https://github.com/scalaprops/scalaprops-shapeless/pull/64#issuecomment-586597526
+          "2.4.0"
+        )
       case _ => List.empty
     }
 }
