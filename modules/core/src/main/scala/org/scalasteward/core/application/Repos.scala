@@ -262,7 +262,6 @@ object Repos {
     Repo("tototoshi", "scala-csv"),
     Repo("folone", "poi.scala"),
     Repo("xdotai", "play-json-extensions"),
-    Repo("eed3si9n", "expecty"),
     Repo("eed3si9n", "gigahorse"),
     Repo("eed3si9n", "sjson-new"),
     // Repo("btlines", "grpcgateway"),
