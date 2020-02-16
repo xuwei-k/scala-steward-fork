@@ -169,10 +169,11 @@ final class NurtureAlg[F[_]](
       }
     } yield ()
 
+  // TODO enable if 2.4.1 released
   def getNonSbtUpdates(repo: Repo): F[List[Update.Single]] =
     for {
       maybeScalafmt <- scalafmtAlg.getScalafmtUpdate(repo)
-    } yield List(maybeScalafmt).flatten
+    } yield Nil //List(maybeScalafmt).flatten
 
   def processUpdates(
       data: NonEmptyList[UpdateData]
