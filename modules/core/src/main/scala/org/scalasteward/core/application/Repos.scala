@@ -24,6 +24,7 @@ object Repos {
   }
 
   val defaultRepos = List(
+    Repo("xuwei-k", "play-ws-scalafix"),
     Repo("xuwei-k", "scalaz-docs"),
     Repo("xuwei-k", "scala-protobuf-docs"),
     Repo("xuwei-k", "scalikejdbc-flyway-sbt-example"),
