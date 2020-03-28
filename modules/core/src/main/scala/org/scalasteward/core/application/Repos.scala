@@ -31,7 +31,6 @@ object Repos {
     Repo("xuwei-k", "mima-web"),
     Repo("xuwei-k", "favorite_typo"),
     Repo("xuwei-k", "applybuilder"),
-    Repo("xuwei-k", "qiitascala"),
     Repo("xuwei-k", "qiita-twitter-bot"),
     Repo("xuwei-k", "play-json-extra"),
     Repo("xuwei-k", "httpz"),
