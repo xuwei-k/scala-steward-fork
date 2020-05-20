@@ -142,7 +142,7 @@ object FilterAlg {
 
   object ScalazVersions {
     def unapply(value: String): Boolean =
-      (value.startsWith("7.3") || value.startsWith("8"))
+      (value.startsWith("7.4") || value.startsWith("8"))
   }
 
   private def badVersions(update: Update.Single): List[String] =
