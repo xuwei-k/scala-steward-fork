@@ -181,6 +181,7 @@ object Repos {
     Repo("scalatra", "scalatra", filter = u => {
       u.groupId =!= "io.dropwizard.metrics" &&
       u.groupId =!= "nl.grons" &&
+      u.groupId =!= "org.scalatra.scalate" &&
       u.groupId =!= "org.apache.httpcomponents" // tests fail
     }),
     Repo("scalatra", "scalamd"),
