@@ -280,8 +280,6 @@ object Repos {
     Repo("etaty", "rediscala"),
     Repo("scalaz", "scalazfix"),
     // Repo("scalaz", "scalaz-deriving"), TODO update scalafix dependency
-    Repo("scalapb", "scalapb-grpcweb"),
-    Repo("scalapb", "scalapb-template.g8")
   ).distinct.map(_.copy(createPullRequest = false))
 
   private[this] val lasts = List(
