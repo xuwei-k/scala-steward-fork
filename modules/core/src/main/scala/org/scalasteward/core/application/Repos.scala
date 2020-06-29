@@ -149,12 +149,7 @@ object Repos {
       "wartremover",
       testCommands = List(
         "test",
-        "+ core/publishLocal",
-        "+ sbt-plugin/scripted"
       ),
-      filter = u => {
-        (u.groupId =!= "org.yaml")
-      }
     ),
     Repo("wartremover", "wartremover-contrib"),
     Repo("wartremover", "own-wart-example"),
