@@ -156,7 +156,7 @@ object Repos {
     // Repo("seratch", "AWScala"),
     Repo("scopt", "scopt"),
     Repo("scalaj", "scalaj-http"),
-    Repo("flyway", "flyway-play"),
+    // Repo("flyway", "flyway-play"),
     Repo(
       "scalikejdbc",
       "scalikejdbc",
@@ -259,10 +259,10 @@ object Repos {
     Repo("tototoshi", "scala-csv"),
     Repo("folone", "poi.scala"),
     Repo("xdotai", "play-json-extensions"),
-    Repo("eed3si9n", "gigahorse"),
-    Repo("eed3si9n", "sjson-new"),
+    // Repo("eed3si9n", "gigahorse"),
+    // Repo("eed3si9n", "sjson-new"),
     // Repo("btlines", "grpcgateway"),
-    Repo("btlines", "pbdirect"),
+    // Repo("btlines", "pbdirect"),
     // Repo("btlines", "grpcmonix"),
     // Repo("btlines", "grpcakkastream"),
     Repo("b-studios", "scala-effekt", filter = u => {
