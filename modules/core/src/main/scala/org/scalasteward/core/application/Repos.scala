@@ -80,18 +80,9 @@ object Repos {
     Repo("msgpack4z", "msgpack4z-jawn"),
     Repo("msgpack4z", "msgpack4z-api"),
     Repo("msgpack4z", "msgpack4z-native"),
-    // TODO scalapb projects does not work with sbt 1.3 due to protobuf conflict?
-    /*
-    Repo("scalapb-json", "scalapb-playjson", filter = u => {
-      u.groupId =!= "org.scala-sbt"
-    }),
-    Repo("scalapb-json", "scalapb-circe", filter = u => {
-      u.groupId =!= "org.scala-sbt"
-    }),
-    Repo("scalapb-json", "scalapb-argonaut", filter = u => {
-      u.groupId =!= "org.scala-sbt"
-    }),
-     */
+    Repo("scalapb-json", "scalapb-playjson"),
+    Repo("scalapb-json", "scalapb-circe"),
+    Repo("scalapb-json", "scalapb-argonaut"),
     Repo("scalapb-json", "scalapb-json-common"),
     Repo("scalapb-json", "protoc-lint")
   ).distinct.map(_.copy(createPullRequest = true))
