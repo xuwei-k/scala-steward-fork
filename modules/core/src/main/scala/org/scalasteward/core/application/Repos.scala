@@ -91,10 +91,8 @@ object Repos {
     Repo("scalapb-json", "scalapb-argonaut", filter = u => {
       u.groupId =!= "org.scala-sbt"
     }),
-    Repo("scalapb-json", "scalapb-json-common", filter = u => {
-      u.groupId =!= "org.scala-sbt"
-    })
      */
+    Repo("scalapb-json", "scalapb-json-common"),
     Repo("scalapb-json", "protoc-lint")
   ).distinct.map(_.copy(createPullRequest = true))
 
