@@ -151,7 +151,7 @@ object Repos {
       "scalikejdbc",
       filter = u => {
         // tests fail with h2 version 1.4.200
-        (u.groupId =!= "org.apache.derby") && (u.groupId =!= "com.h2database")
+        (u.groupId =!= "org.apache.derby") && (u.groupId =!= "com.h2database") && (u.groupId =!= "org.hsqldb")
       }
     ),
     Repo("scalikejdbc", "scalikejdbc-play-support"),
