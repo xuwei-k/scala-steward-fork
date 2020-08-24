@@ -191,7 +191,7 @@ object Repos {
       "sbt-assembly",
       testCommands = List(
         "test",
-        "^scripted"
+        // "^scripted" // too slow
       )
     ),
     Repo(
