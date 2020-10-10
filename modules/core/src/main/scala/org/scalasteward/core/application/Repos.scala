@@ -261,8 +261,8 @@ object Repos {
     }),
     Repo("runarorama", "latr"),
     Repo("debasishg", "scala-redis"),
-    Repo("t2v", "holidays"),
-    Repo("dispatch", "reboot"),
+    // Repo("t2v", "holidays"),
+    // Repo("dispatch", "reboot"),
     Repo("etaty", "rediscala"),
     Repo("scalaz", "scalazfix"),
     // Repo("scalaz", "scalaz-deriving"), TODO update scalafix dependency
