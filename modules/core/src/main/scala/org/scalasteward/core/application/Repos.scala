@@ -96,7 +96,6 @@ object Repos {
     Repo("foundweekends", "knockoff"),
     Repo("foundweekends", "conscript"),
     Repo("foundweekends", "pamflet"),
-    Repo("argonaut-io", "argonaut"),
     Repo("squeryl", "squeryl", filter = u => {
       u.groupId =!= "org.apache.derby"
     }),
@@ -111,7 +110,6 @@ object Repos {
         "com.enragedginger" //  don't update akka 2.6
       ).contains(u.groupId)
     }),
-    Repo("nscala-time", "nscala-time"),
     Repo(
       "unfiltered",
       "website",
@@ -130,7 +128,6 @@ object Repos {
     Repo("unfiltered", "coffee-filter.g8"),
     Repo("unfiltered", "unfiltered-war.g8"),
     Repo("unfiltered", "unfiltered-slick.g8"),
-    Repo("json4s", "json4s"),
     Repo(
       "wartremover",
       "wartremover",
@@ -245,7 +242,6 @@ object Repos {
       )
     ),
     // Repo("tototoshi", "slick-joda-mapper"),
-    Repo("tototoshi", "scala-csv"),
     Repo("folone", "poi.scala"),
     Repo("xdotai", "play-json-extensions"),
     // Repo("eed3si9n", "gigahorse"),
