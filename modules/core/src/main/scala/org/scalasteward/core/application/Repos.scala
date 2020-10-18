@@ -265,14 +265,9 @@ object Repos {
     // Repo("dispatch", "reboot"),
     Repo("etaty", "rediscala"),
     Repo("scalaz", "scalazfix"),
-    // Repo("scalaz", "scalaz-deriving"), TODO update scalafix dependency
   ).distinct.map(_.copy(createPullRequest = false))
 
-  private[this] val lasts = List(
-    Repo("scalaz", "scalaz")
-  )
-
-  val repositories = (defaultRepos ::: anotherRepos).sortBy(_.show) ::: lasts
+  val repositories = (defaultRepos ::: anotherRepos).sortBy(_.show)
 
   def partial[A](x: Int, y: Int, values: List[A]): List[A] = {
     val n0 = math.max(values.size / y, 0)
