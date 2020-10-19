@@ -95,9 +95,6 @@ object Repos {
     Repo("foundweekends", "giter8"),
     Repo("foundweekends", "conscript"),
     Repo("foundweekends", "pamflet"),
-    Repo("squeryl", "squeryl", filter = u => {
-      u.groupId =!= "org.apache.derby"
-    }),
     Repo("gitbucket", "gitbucket", filter = u => {
       !Set(
         "com.h2database",
@@ -127,7 +124,6 @@ object Repos {
     Repo("unfiltered", "coffee-filter.g8"),
     Repo("unfiltered", "unfiltered-war.g8"),
     Repo("unfiltered", "unfiltered-slick.g8"),
-    Repo("wartremover", "wartremover-contrib"),
     Repo("wartremover", "own-wart-example"),
     // Repo("seratch", "AWScala"),
     Repo("scopt", "scopt"),
@@ -141,10 +137,6 @@ object Repos {
         (u.groupId =!= "org.apache.derby") && (u.groupId =!= "com.h2database") && (u.groupId =!= "org.hsqldb")
       }
     ),
-    Repo("scalikejdbc", "scalikejdbc-play-support"),
-    Repo("scalikejdbc", "csvquery", filter = u => {
-      u.groupId =!= "com.h2database"
-    }),
     //   Repo("skinny-framework", "skinny-micro"),
     //   Repo("skinny-framework", "skinny-framework"),
     Repo("scalate", "scalate", filter = u => {
