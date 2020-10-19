@@ -93,7 +93,6 @@ object Repos {
       u.groupId =!= "org.testng"
     }),
     Repo("foundweekends", "giter8"),
-    Repo("foundweekends", "knockoff"),
     Repo("foundweekends", "conscript"),
     Repo("foundweekends", "pamflet"),
     Repo("squeryl", "squeryl", filter = u => {
@@ -128,13 +127,6 @@ object Repos {
     Repo("unfiltered", "coffee-filter.g8"),
     Repo("unfiltered", "unfiltered-war.g8"),
     Repo("unfiltered", "unfiltered-slick.g8"),
-    Repo(
-      "wartremover",
-      "wartremover",
-      testCommands = List(
-        "test",
-      ),
-    ),
     Repo("wartremover", "wartremover-contrib"),
     Repo("wartremover", "own-wart-example"),
     // Repo("seratch", "AWScala"),
@@ -150,7 +142,6 @@ object Repos {
       }
     ),
     Repo("scalikejdbc", "scalikejdbc-play-support"),
-    Repo("scalikejdbc", "scalikejdbc-async"),
     Repo("scalikejdbc", "csvquery", filter = u => {
       u.groupId =!= "com.h2database"
     }),
