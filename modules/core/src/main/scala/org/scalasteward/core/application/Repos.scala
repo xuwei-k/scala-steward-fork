@@ -241,7 +241,6 @@ object Repos {
     // Repo("t2v", "holidays"),
     // Repo("dispatch", "reboot"),
     Repo("etaty", "rediscala"),
-    Repo("scalaz", "scalazfix"),
   ).distinct.map(_.copy(createPullRequest = false))
 
   val repositories = (defaultRepos ::: anotherRepos).sortBy(_.show)
