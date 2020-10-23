@@ -134,7 +134,10 @@ object Repos {
       "scalikejdbc",
       filter = u => {
         // tests fail with h2 version 1.4.200
-        (u.groupId =!= "org.apache.derby") && (u.groupId =!= "com.h2database") && (u.groupId =!= "org.hsqldb")
+        (u.groupId =!= "org.apache.derby") &&
+        (u.groupId =!= "com.h2database") &&
+        (u.groupId =!= "ch.epfl.lamp") && // TODO re-enable when dotty 3.0.0-M1 released
+        (u.groupId =!= "org.hsqldb")
       }
     ),
     //   Repo("skinny-framework", "skinny-micro"),
