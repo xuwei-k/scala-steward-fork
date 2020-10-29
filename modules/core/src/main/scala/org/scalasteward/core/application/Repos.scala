@@ -124,7 +124,6 @@ object Repos {
     Repo("unfiltered", "coffee-filter.g8"),
     Repo("unfiltered", "unfiltered-war.g8"),
     Repo("unfiltered", "unfiltered-slick.g8"),
-    Repo("wartremover", "own-wart-example"),
     // Repo("seratch", "AWScala"),
     Repo("scopt", "scopt"),
     Repo("scalaj", "scalaj-http"),
