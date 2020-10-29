@@ -142,9 +142,9 @@ object Repos {
     ),
     //   Repo("skinny-framework", "skinny-micro"),
     //   Repo("skinny-framework", "skinny-framework"),
-    Repo("scalate", "scalate", filter = u => {
-      u.groupId =!= "org.atmosphere"
-    }),
+    // Repo("scalate", "scalate", filter = u => {
+    //  u.groupId =!= "org.atmosphere"
+    // }),
     Repo("scalatra", "scalatra", filter = u => {
       u.groupId =!= "io.dropwizard.metrics" &&
       u.groupId =!= "nl.grons" &&
