@@ -162,7 +162,7 @@ object SbtAlg {
         maybeIgnoreOptsFiles(repoDir)(processAlg.exec(command, repoDir, "[" + repoDir.name + "]"))
 
       def sbtCmd(commands: List[String]): Nel[String] =
-        Nel.of("sbt", "-batch", "-no-colors", commands.mkString(";", ";", ""))
+        Nel.of("sbt", "-batch", "-no-colors", "-Dsbt.log.noformat=true", "-Dsbt.supershell=false", commands.mkString(";", ";", ""))
 
       def maybeIgnoreOptsFiles[A](dir: File)(fa: F[A]): F[A] =
         if (config.ignoreOptsFiles) ignoreOptsFiles(dir)(fa) else fa
