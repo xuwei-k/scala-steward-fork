@@ -13,7 +13,7 @@ before_cache:
 - find $HOME/.ivy2/cache -name "ivydata-*.properties" | xargs rm
 - find $HOME/.ivy2/cache -name "*SNAPSHOT*" | xargs rm -rf
 script:
-- sbt "++ ${TRAVIS_SCALA_VERSION}" "core/run ${RUN_ARGUMENT}"
+- sbt -batch -no-colors -Dsbt.log.noformat=true -Dsbt.supershell=false "++ ${TRAVIS_SCALA_VERSION}" "core/run ${RUN_ARGUMENT}"
 env:
   matrix:
   - RUN_ARGUMENT="0-12"
