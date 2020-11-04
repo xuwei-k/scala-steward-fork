@@ -125,8 +125,8 @@ object Repos {
     Repo("unfiltered", "unfiltered-war.g8"),
     Repo("unfiltered", "unfiltered-slick.g8"),
     // Repo("seratch", "AWScala"),
-    Repo("scopt", "scopt"),
-    Repo("scalaj", "scalaj-http"),
+    // Repo("scopt", "scopt"),
+    // Repo("scalaj", "scalaj-http"),
     // Repo("flyway", "flyway-play"),
     Repo(
       "scalikejdbc",
@@ -141,9 +141,10 @@ object Repos {
     ),
     //   Repo("skinny-framework", "skinny-micro"),
     //   Repo("skinny-framework", "skinny-framework"),
-    // Repo("scalate", "scalate", filter = u => {
-    //  u.groupId =!= "org.atmosphere"
-    // }),
+    /*
+    Repo("scalate", "scalate", filter = u => {
+     u.groupId =!= "org.atmosphere"
+    }),
     Repo("scalatra", "scalatra", filter = u => {
       u.groupId =!= "io.dropwizard.metrics" &&
       u.groupId =!= "nl.grons" &&
@@ -159,6 +160,7 @@ object Repos {
       )
     ),
     Repo("scalatra", "scalatra.g8"),
+    */
     Repo(
       "sbt",
       "sbt-protobuf",
@@ -176,6 +178,7 @@ object Repos {
         // "^scripted" // too slow
       )
     ),
+    /*
     Repo(
       "sbt",
       "sbt-buildinfo",
@@ -184,6 +187,7 @@ object Repos {
         "^scripted"
       )
     ),
+    */
     Repo(
       "sbt",
       "sbt-ghpages",
@@ -192,6 +196,7 @@ object Repos {
         "^scripted"
       )
     ),
+    /*
     Repo(
       "sbt",
       "sbt-sriracha",
@@ -201,6 +206,7 @@ object Repos {
       )
     ),
     Repo("sbt", "contraband"),
+    */
     // Repo("sbt", "util"),
     // Repo("sbt", "io"),
     // TODO: not found sbt-git 0.8.5 (sbt-houserules 0.3.1 depends on sbt-git)
@@ -216,8 +222,8 @@ object Repos {
     ),
     */
     // Repo("sbt", "zinc"),
-    Repo("sbt", "sbinary"),
-    Repo("sbt", "junit-interface"),
+    // Repo("sbt", "sbinary"),
+    // Repo("sbt", "junit-interface"),
     Repo(
       "tototoshi",
       "sbt-slick-codegen",
@@ -228,7 +234,7 @@ object Repos {
     ),
     // Repo("tototoshi", "slick-joda-mapper"),
     Repo("folone", "poi.scala"),
-    Repo("xdotai", "play-json-extensions"),
+    // Repo("xdotai", "play-json-extensions"),
     // Repo("eed3si9n", "gigahorse"),
     // Repo("eed3si9n", "sjson-new"),
     // Repo("btlines", "grpcgateway"),
@@ -239,7 +245,7 @@ object Repos {
       u.groupId =!= "com.47deg" // TODO sbt-microsites
     }),
     Repo("runarorama", "latr"),
-    Repo("debasishg", "scala-redis"),
+    // Repo("debasishg", "scala-redis"),
     // Repo("t2v", "holidays"),
     // Repo("dispatch", "reboot"),
     Repo("etaty", "rediscala"),
