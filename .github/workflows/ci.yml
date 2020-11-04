@@ -1,0 +1,28 @@
+name: CI
+on:
+  pull_request:
+  push:
+  schedule:
+  - cron: '20 9,21 * * 0'
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - args: "0-8"
+          - args: "1-8"
+          - args: "2-8"
+          - args: "3-8"
+          - args: "4-8"
+          - args: "5-8"
+          - args: "6-8"
+          - args: "7-8"
+    steps:
+    - uses: actions/checkout@v1
+    - uses: olafurpg/setup-scala@v10
+      with:
+        java-version: "adopt@1.8"
+    - uses: coursier/cache-action@v5
+    - run: GITHUB_TOKEN="${{secrets.ADMIN_GITHUB_TOKEN}}" sbt -batch -no-colors -Dsbt.log.noformat=true -Dsbt.supershell=false "core/run ${{matrix.args}}"
