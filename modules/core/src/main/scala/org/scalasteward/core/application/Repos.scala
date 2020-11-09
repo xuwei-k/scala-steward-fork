@@ -93,8 +93,13 @@ object Repos {
       u.groupId =!= "org.testng"
     }),
     Repo("foundweekends", "giter8"),
+    Repo("foundweekends", "knockoff"),
     Repo("foundweekends", "conscript"),
     Repo("foundweekends", "pamflet"),
+    Repo("argonaut-io", "argonaut"),
+    Repo("squeryl", "squeryl", filter = u => {
+      u.groupId =!= "org.apache.derby"
+    }),
     Repo("gitbucket", "gitbucket", filter = u => {
       !Set(
         "com.h2database",
@@ -106,6 +111,9 @@ object Repos {
         "com.enragedginger" //  don't update akka 2.6
       ).contains(u.groupId)
     }),
+    Repo("nscala-time", "nscala-time"),
+    Repo("scala-text", "S99"),
+    Repo("scala-text", "scala_text"),
     Repo(
       "unfiltered",
       "website",
@@ -124,6 +132,16 @@ object Repos {
     Repo("unfiltered", "coffee-filter.g8"),
     Repo("unfiltered", "unfiltered-war.g8"),
     Repo("unfiltered", "unfiltered-slick.g8"),
+    Repo("json4s", "json4s"),
+    Repo(
+      "wartremover",
+      "wartremover",
+      testCommands = List(
+        "test",
+      ),
+    ),
+    Repo("wartremover", "wartremover-contrib"),
+    Repo("wartremover", "own-wart-example"),
     // Repo("seratch", "AWScala"),
     // Repo("scopt", "scopt"),
     // Repo("scalaj", "scalaj-http"),
@@ -139,6 +157,11 @@ object Repos {
         (u.groupId =!= "org.hsqldb")
       }
     ),
+    Repo("scalikejdbc", "scalikejdbc-play-support"),
+    Repo("scalikejdbc", "scalikejdbc-async"),
+    Repo("scalikejdbc", "csvquery", filter = u => {
+      u.groupId =!= "com.h2database"
+    }),
     //   Repo("skinny-framework", "skinny-micro"),
     //   Repo("skinny-framework", "skinny-framework"),
     /*
@@ -233,6 +256,7 @@ object Repos {
       )
     ),
     // Repo("tototoshi", "slick-joda-mapper"),
+    Repo("tototoshi", "scala-csv"),
     Repo("folone", "poi.scala"),
     // Repo("xdotai", "play-json-extensions"),
     // Repo("eed3si9n", "gigahorse"),
@@ -249,9 +273,15 @@ object Repos {
     // Repo("t2v", "holidays"),
     // Repo("dispatch", "reboot"),
     Repo("etaty", "rediscala"),
+    Repo("scalaz", "scalazfix"),
+    // Repo("scalaz", "scalaz-deriving"), TODO update scalafix dependency
   ).distinct.map(_.copy(createPullRequest = false))
 
-  val repositories = (defaultRepos ::: anotherRepos).sortBy(_.show)
+  private[this] val lasts = List(
+    Repo("scalaz", "scalaz")
+  )
+
+  val repositories = (defaultRepos ::: anotherRepos).sortBy(_.show) ::: lasts
 
   def partial[A](x: Int, y: Int, values: List[A]): List[A] = {
     val n0 = math.max(values.size / y, 0)
