@@ -16,12 +16,21 @@
 
 package org.scalasteward.core.github.http4s
 
+import io.circe.Encoder
 import org.http4s.{Request, Uri}
 import org.scalasteward.core.git.Branch
 import org.scalasteward.core.github._
 import org.scalasteward.core.util.HttpJsonClient
 import org.scalasteward.core.vcs.VCSApiAlg
 import org.scalasteward.core.vcs.data._
+
+case class ForkOrg(organization: String)
+object ForkOrg {
+  val default = ForkOrg("xuwei-k-fork")
+
+  implicit val encoder: Encoder[ForkOrg] =
+    io.circe.generic.semiauto.deriveEncoder
+}
 
 final class Http4sGitHubApiAlg[F[_]](
     gitHubApiHost: Uri,
@@ -33,7 +42,7 @@ final class Http4sGitHubApiAlg[F[_]](
   private val url = new Url(gitHubApiHost)
 
   override def createFork(repo: Repo): F[RepoOut] =
-    client.post(url.forks(repo), modify(repo))
+    client.postWithBody(url.forks(repo), ForkOrg.default, modify(repo))
 
   override def createPullRequest(repo: Repo, data: NewPullRequestData): F[PullRequestOut] =
     client.postWithBody(url.pulls(repo), data, modify(repo))
