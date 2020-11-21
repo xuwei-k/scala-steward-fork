@@ -39,7 +39,7 @@ object Cli {
       gitAuthorEmail: String = "74788111+xuwei-k-bot[bot]@users.noreply.github.com",
       vcsType: SupportedVCS = SupportedVCS.GitHub,
       vcsApiHost: Uri = uri"https://api.github.com",
-      vcsLogin: String = "xuwei-k-bot[bot]",
+      vcsLogin: String = "xuwei-k",
       gitAskPass: String = "dummy git ask pass",
       signCommits: Boolean = false,
       whitelist: List[String] = Nil,
