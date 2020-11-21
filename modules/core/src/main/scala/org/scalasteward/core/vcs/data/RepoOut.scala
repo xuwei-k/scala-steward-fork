@@ -37,7 +37,7 @@ final case class RepoOut(
     Repo(owner.login, name)
 
   def cloneUrlSsh: String =
-    s"https://xuwei-k:${sys.env("GITHUB_TOKEN")}@github.com/${owner.login}/${name}"
+    s"https://xuwei-k-bot[bot]:${sys.env("GITHUB_TOKEN")}@github.com/${owner.login}/${name}"
 }
 
 object RepoOut {
