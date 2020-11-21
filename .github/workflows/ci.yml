@@ -18,4 +18,10 @@ jobs:
       with:
         java-version: "adopt@1.8"
     - uses: coursier/cache-action@v5
-    - run: GITHUB_TOKEN="${{secrets.XUWEI_K_BOT_SECRET}}" sbt -batch -no-colors -Dsbt.log.noformat=true -Dsbt.supershell=false "core/run ${{matrix.args}}"
+    - name: Generate token
+      id: generate_token
+      uses: tibdex/github-app-token@v1
+      with:
+        app_id: 89536
+        private_key: ${{ secrets.XUWEI_K_BOT_SECRET }}
+    - run: GITHUB_TOKEN="${{steps.generate_token.outputs.token}}" sbt -batch -no-colors -Dsbt.log.noformat=true -Dsbt.supershell=false "core/run ${{matrix.args}}"
