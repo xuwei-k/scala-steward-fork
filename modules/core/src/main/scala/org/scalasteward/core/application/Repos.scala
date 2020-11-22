@@ -111,7 +111,6 @@ object Repos {
       ).contains(u.groupId)
     }),
     Repo("nscala-time", "nscala-time"),
-    Repo("scala-text", "S99"),
     Repo("scala-text", "scala_text"),
     Repo(
       "unfiltered",
@@ -131,16 +130,6 @@ object Repos {
     Repo("unfiltered", "coffee-filter.g8"),
     Repo("unfiltered", "unfiltered-war.g8"),
     Repo("unfiltered", "unfiltered-slick.g8"),
-    Repo("json4s", "json4s"),
-    Repo(
-      "wartremover",
-      "wartremover",
-      testCommands = List(
-        "test",
-      ),
-    ),
-    Repo("wartremover", "wartremover-contrib"),
-    Repo("wartremover", "own-wart-example"),
     // Repo("seratch", "AWScala"),
     // Repo("scopt", "scopt"),
     // Repo("scalaj", "scalaj-http"),
@@ -267,15 +256,10 @@ object Repos {
     // Repo("t2v", "holidays"),
     // Repo("dispatch", "reboot"),
     Repo("etaty", "rediscala"),
-    Repo("scalaz", "scalazfix"),
     // Repo("scalaz", "scalaz-deriving"), TODO update scalafix dependency
   ).distinct.map(_.copy(createPullRequest = false))
 
-  private[this] val lasts = List(
-    Repo("scalaz", "scalaz")
-  )
-
-  val repositories = (defaultRepos ::: anotherRepos).sortBy(_.show) ::: lasts
+  val repositories = (defaultRepos ::: anotherRepos).sortBy(_.show)
 
   def partial[A](x: Int, y: Int, values: List[A]): List[A] = {
     val n0 = math.max(values.size / y, 0)
