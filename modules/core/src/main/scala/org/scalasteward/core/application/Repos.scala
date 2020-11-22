@@ -92,8 +92,6 @@ object Repos {
     Repo("sirthias", "parboiled", filter = u => {
       u.groupId =!= "org.testng"
     }),
-    Repo("foundweekends", "giter8"),
-    Repo("foundweekends", "knockoff"),
     Repo("foundweekends", "conscript"),
     Repo("foundweekends", "pamflet"),
     Repo("squeryl", "squeryl", filter = u => {
