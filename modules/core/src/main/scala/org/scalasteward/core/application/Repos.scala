@@ -112,24 +112,6 @@ object Repos {
     }),
     Repo("nscala-time", "nscala-time"),
     Repo("scala-text", "scala_text"),
-    Repo(
-      "unfiltered",
-      "website",
-      testCommands = List(
-        // TODO update sbt plugins
-        // https://github.com/unfiltered/website/blob/0cc9371cf45c3e31050bfdabd275e179e38302d2/.travis.yml#L6
-        "compile",
-        "paradox:paradox"
-      )
-    ),
-    Repo("unfiltered", "unfiltered-websockets.g8"),
-    Repo("unfiltered", "unfiltered-netty.g8"),
-    Repo("unfiltered", "unfiltered-gae.g8"),
-    Repo("unfiltered", "unfiltered.g8"),
-    Repo("unfiltered", "unfiltered-scalate.g8"),
-    Repo("unfiltered", "coffee-filter.g8"),
-    Repo("unfiltered", "unfiltered-war.g8"),
-    Repo("unfiltered", "unfiltered-slick.g8"),
     // Repo("seratch", "AWScala"),
     // Repo("scopt", "scopt"),
     // Repo("scalaj", "scalaj-http"),
