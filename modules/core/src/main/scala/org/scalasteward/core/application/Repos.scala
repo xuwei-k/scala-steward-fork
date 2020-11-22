@@ -94,9 +94,6 @@ object Repos {
     }),
     Repo("foundweekends", "conscript"),
     Repo("foundweekends", "pamflet"),
-    Repo("squeryl", "squeryl", filter = u => {
-      u.groupId =!= "org.apache.derby"
-    }),
     Repo("gitbucket", "gitbucket", filter = u => {
       !Set(
         "com.h2database",
@@ -108,23 +105,10 @@ object Repos {
         "com.enragedginger" //  don't update akka 2.6
       ).contains(u.groupId)
     }),
-    Repo("nscala-time", "nscala-time"),
-    Repo("scala-text", "scala_text"),
     // Repo("seratch", "AWScala"),
     // Repo("scopt", "scopt"),
     // Repo("scalaj", "scalaj-http"),
     // Repo("flyway", "flyway-play"),
-    Repo(
-      "scalikejdbc",
-      "scalikejdbc",
-      filter = u => {
-        // tests fail with h2 version 1.4.200
-        (u.groupId =!= "org.apache.derby") &&
-        (u.groupId =!= "com.h2database") &&
-        (u.groupId =!= "ch.epfl.lamp") && // TODO re-enable when dotty 3.0.0-M1 released
-        (u.groupId =!= "org.hsqldb")
-      }
-    ),
     //   Repo("skinny-framework", "skinny-micro"),
     //   Repo("skinny-framework", "skinny-framework"),
     /*
