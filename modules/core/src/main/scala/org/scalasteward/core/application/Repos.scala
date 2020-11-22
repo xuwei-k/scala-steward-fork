@@ -96,7 +96,6 @@ object Repos {
     Repo("foundweekends", "knockoff"),
     Repo("foundweekends", "conscript"),
     Repo("foundweekends", "pamflet"),
-    Repo("argonaut-io", "argonaut"),
     Repo("squeryl", "squeryl", filter = u => {
       u.groupId =!= "org.apache.derby"
     }),
@@ -157,11 +156,6 @@ object Repos {
         (u.groupId =!= "org.hsqldb")
       }
     ),
-    Repo("scalikejdbc", "scalikejdbc-play-support"),
-    Repo("scalikejdbc", "scalikejdbc-async"),
-    Repo("scalikejdbc", "csvquery", filter = u => {
-      u.groupId =!= "com.h2database"
-    }),
     //   Repo("skinny-framework", "skinny-micro"),
     //   Repo("skinny-framework", "skinny-framework"),
     /*
