@@ -92,8 +92,6 @@ object Repos {
     Repo("sirthias", "parboiled", filter = u => {
       u.groupId =!= "org.testng"
     }),
-    Repo("foundweekends", "conscript"),
-    Repo("foundweekends", "pamflet"),
     Repo("gitbucket", "gitbucket", filter = u => {
       !Set(
         "com.h2database",
