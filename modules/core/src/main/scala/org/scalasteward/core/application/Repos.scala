@@ -155,7 +155,6 @@ object Repos {
         "^scripted"
       )
     ),
-    */
     Repo(
       "sbt",
       "sbt-ghpages",
@@ -164,7 +163,6 @@ object Repos {
         "^scripted"
       )
     ),
-    /*
     Repo(
       "sbt",
       "sbt-sriracha",
@@ -202,7 +200,7 @@ object Repos {
     ),
     // Repo("tototoshi", "slick-joda-mapper"),
     Repo("tototoshi", "scala-csv"),
-    Repo("folone", "poi.scala"),
+    // Repo("folone", "poi.scala"),
     // Repo("xdotai", "play-json-extensions"),
     // Repo("eed3si9n", "gigahorse"),
     // Repo("eed3si9n", "sjson-new"),
@@ -213,7 +211,7 @@ object Repos {
     Repo("b-studios", "scala-effekt", filter = u => {
       u.groupId =!= "com.47deg" // TODO sbt-microsites
     }),
-    Repo("runarorama", "latr"),
+    // Repo("runarorama", "latr"),
     // Repo("debasishg", "scala-redis"),
     // Repo("t2v", "holidays"),
     // Repo("dispatch", "reboot"),
