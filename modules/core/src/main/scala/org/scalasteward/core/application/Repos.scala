@@ -32,7 +32,7 @@ object Repos {
     Repo("xuwei-k", "mima-web"),
     Repo("xuwei-k", "favorite_typo"),
     Repo("xuwei-k", "applybuilder"),
-    Repo("xuwei-k", "qiita-twitter-bot"),
+    Repo("xuwei-k", "qiita-twitter-bot", testCommands = List("test:compile", "assembly")),
     Repo("xuwei-k", "play-json-extra"),
     Repo("xuwei-k", "httpz"),
     Repo("xuwei-k", "webpush-scala"),
