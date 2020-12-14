@@ -12,10 +12,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - args: "0-4"
-          - args: "1-4"
-          - args: "2-4"
-          - args: "3-4"
+          - args: "0-2"
+          - args: "1-2"
     steps:
     - uses: actions/checkout@v1
     - uses: olafurpg/setup-scala@v10
