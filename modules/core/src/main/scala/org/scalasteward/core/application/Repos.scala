@@ -57,6 +57,7 @@ object Repos {
     Repo("xuwei-k", "scalajspack"),
     Repo("xuwei-k", "wartremover-scalikejdbc"),
     Repo("xuwei-k", "scodec-msgpack"),
+    /*
     Repo("scalaprops", "scalaprops"),
     Repo("scalaprops", "scalaprops-deriving"),
     Repo("scalaprops", "scalaprops-native-example"),
@@ -85,6 +86,7 @@ object Repos {
     Repo("scalapb-json", "scalapb-argonaut"),
     Repo("scalapb-json", "scalapb-json-common"),
     Repo("scalapb-json", "protoc-lint")
+    */
   ).distinct.map(_.copy(createPullRequest = true))
 
   val anotherRepos = List(
