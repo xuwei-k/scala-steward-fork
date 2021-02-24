@@ -24,6 +24,7 @@ object Repos {
   }
 
   val defaultRepos = List(
+    Repo("xuwei-k", "jwt-scala"),
     Repo("xuwei-k", "replace-symbol-literals"),
     Repo("xuwei-k", "play-ws-scalafix"),
     Repo("xuwei-k", "scalaz-docs"),
