@@ -41,7 +41,7 @@ object Repos {
     Repo("xuwei-k", "httpmock"),
     // Repo("xuwei-k", "msgpack-json"),
     // Repo("xuwei-k", "javadoc-badge"),
-    Repo("xuwei-k", "scalaz-magnolia"),
+    // Repo("xuwei-k", "scalaz-magnolia"),
     Repo("xuwei-k", "iarray"),
     Repo("xuwei-k", "githubot"),
     Repo("xuwei-k", "play2scalaz"),
